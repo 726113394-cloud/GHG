@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHG v1.0.0 文档 | Gost's HunterGame · PvE 逃亡</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    background:#080a14;
+    font-family:'Inter',sans-serif;
+    color:#eef2ff;
+    line-height:1.7;
+    scroll-behavior:smooth;
+    overflow-x:hidden;
+}
+.bg-glow{
+    position:fixed;inset:0;pointer-events:none;z-index:-2;
+    background:radial-gradient(circle at 20% 30%,rgba(180,70,120,.35),rgba(60,40,140,.2) 40%,#080a14 85%);
+    animation:breathe 12s ease-in-out infinite alternate;
+}
+.bg-glow::after{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(circle at 80% 70%,rgba(255,80,80,.15),transparent 60%);
+    animation:breathe2 15s ease-in-out infinite alternate;
+}
+@keyframes breathe{0%{transform:scale(1) rotate(0);opacity:.7}100%{transform:scale(1.2) rotate(3deg);opacity:1}}
+@keyframes breathe2{0%{transform:scale(.9) rotate(-2deg);opacity:.5}100%{transform:scale(1.1) rotate(2deg);opacity:.9}}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.02);border-radius:10px}
+::-webkit-scrollbar-thumb{background:rgba(255,100,100,.4);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,100,100,.7)}
+.container{max-width:1400px;margin:0 auto;padding:0 2rem;position:relative;z-index:2}
+
+/* ===== 导航栏 ===== */
+.navbar{
+    position:sticky;top:0;z-index:100;
+    background:rgba(8,10,20,.55);
+    backdrop-filter:blur(40px) saturate(1.2);
+    -webkit-backdrop-filter:blur(40px) saturate(1.2);
+    border-bottom:1px solid rgba(255,255,255,.06);
+    padding:.6rem 0;
+    transition:box-shadow .4s;
+}
+.navbar:hover{box-shadow:0 4px 30px rgba(0,0,0,.4)}
+.nav-content{
+    max-width:1400px;margin:0 auto;padding:0 2rem;
+    display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;
+}
+.logo{font-weight:800;font-size:1.8rem;letter-spacing:-.5px}
+.logo .ghg{background:linear-gradient(135deg,#c084fc,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo .rainbow{
+    background:linear-gradient(90deg,#ff7b7b,#ffb347,#6ee7b7,#60a5fa,#f472b6,#ff7b7b);
+    background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:rainbow 4s linear infinite;
+}
+@keyframes rainbow{0%{background-position:0 center}100%{background-position:300% center}}
+.nav-links{display:flex;gap:.2rem;flex-wrap:wrap}
+.nav-links a{
+    color:#aab4d0;text-decoration:none;font-size:.85rem;font-weight:600;
+    padding:.4rem .9rem;border-radius:40px;transition:all .3s;
+}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+
+/* ===== Hero ===== */
+.hero{
+    text-align:center;padding:4rem 1rem 3rem;
+    animation:fadeUp .8s cubic-bezier(.23,1,.32,1) both;
+}
+.hero h1{
+    font-size:3.2rem;font-weight:800;letter-spacing:-1.5px;
+    background:linear-gradient(135deg,#f0f2ff,#a5b4fc);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:.8rem;
+}
+.hero .sub{
+    color:#b8c4e0;font-size:1.1rem;max-width:720px;margin:0 auto 1.5rem;
+}
+.badges{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.8rem}
+.badge{
+    padding:.35rem 1.1rem;border-radius:40px;font-size:.78rem;font-weight:600;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(10px);color:#c8d0e8;
+}
+.badge-accent{background:rgba(255,80,80,.12);border-color:rgba(255,80,80,.25);color:#ffb7b7}
+.badge-green{background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.25);color:#6ee7b7}
+.badge-blue{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#b8d0ff}
+.badge-gold{background:rgba(255,179,71,.12);border-color:rgba(255,179,71,.25);color:#fde68a}
+.hero-links{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.hero-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:.65rem 1.8rem;border-radius:40px;font-weight:600;font-size:.9rem;
+    text-decoration:none;transition:all .4s cubic-bezier(.34,1.56,.64,1);
+    background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);color:#b8d0ff;
+}
+.hero-btn:hover{background:rgba(59,130,246,.22);border-color:rgba(59,130,246,.4);color:#fff;transform:translateY(-2px)}
+.hero-btn.secondary{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#c8d0e8}
+.hero-btn.secondary:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15)}
+
+/* ===== Section ===== */
+.section{
+    margin:2.5rem 0;scroll-margin-top:80px;
+    animation:fadeUp .8s cubic-bezier(.23,1,.32,1) both;
+}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
+.section-title{
+    font-size:1.8rem;font-weight:700;margin-bottom:1.5rem;
+    background:linear-gradient(135deg,#f0f2ff,#a5b4fc);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    display:inline-block;position:relative;
+}
+.section-title::after{
+    content:'';position:absolute;bottom:-4px;left:0;width:60%;height:3px;
+    background:linear-gradient(90deg,rgba(255,100,100,.6),transparent);border-radius:10px;
+}
+
+/* ===== 液态玻璃卡片 ===== */
+.card{
+    background:rgba(255,255,255,.04);
+    backdrop-filter:blur(24px) saturate(1.1);
+    -webkit-backdrop-filter:blur(24px) saturate(1.1);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:28px;padding:1.5rem;
+    transition:all .5s cubic-bezier(.34,1.56,.64,1);
+    box-shadow:0 8px 32px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.05);
+    position:relative;overflow:hidden;
+}
+.card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);opacity:.5;
+}
+.card:hover{
+    transform:translateY(-6px) scale(1.01);
+    border-color:rgba(255,255,255,.15);
+    box-shadow:0 16px 48px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
+    background:rgba(255,255,255,.07);
+}
+.card-human{background:rgba(46,204,113,.08)!important;border-left:3px solid rgba(46,204,113,.5)!important}
+.card-ghost{background:rgba(231,76,60,.08)!important;border-left:3px solid rgba(231,76,60,.5)!important}
+.card-gold{background:rgba(255,179,71,.08)!important;border-left:3px solid rgba(255,179,71,.5)!important}
+
+.grid-2col{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.grid-3col{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid-4col{display:grid;gap:1.2rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+
+/* ===== 折叠面板 ===== */
+.collapsible{
+    background:rgba(255,255,255,.03);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.06);border-radius:28px;
+    margin:1rem 0;overflow:hidden;transition:box-shadow .4s;
+}
+.collapsible:hover{box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.collapsible-header{
+    padding:1.2rem 1.8rem;font-weight:700;cursor:pointer;
+    display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,255,255,.02);transition:all .3s;
+    color:#d4dcff;font-size:1.1rem;user-select:none;
+}
+.collapsible-header:hover{background:rgba(255,255,255,.06);color:#fff}
+.collapsible-header i{transition:transform .4s cubic-bezier(.22,1,.36,1)}
+.collapsible-content{
+    padding:0 1.8rem;max-height:0;overflow:hidden;
+    transition:max-height .45s cubic-bezier(.22,1,.36,1),padding .4s cubic-bezier(.22,1,.36,1);
+    background:rgba(0,0,0,.1);border-top:0 solid transparent;
+}
+.collapsible-content.show{padding:1.5rem 1.8rem;max-height:9000px;border-top:1px solid rgba(255,255,255,.03)}
+.collapsible-content.show + .collapsible-header i,
+.collapsible-header.active i{transform:rotate(180deg)}
+
+/* ===== 标签 ===== */
+.tag{
+    display:inline-block;padding:.15rem .7rem;border-radius:30px;
+    font-size:.7rem;font-weight:600;border:1px solid transparent;
+}
+.tag-red{background:rgba(255,80,80,.15);color:#ffb7b7;border-color:rgba(255,80,80,.2)}
+.tag-green{background:rgba(46,204,113,.15);color:#6ee7b7;border-color:rgba(46,204,113,.2)}
+.tag-blue{background:rgba(59,130,246,.15);color:#b8d0ff;border-color:rgba(59,130,246,.2)}
+.tag-purple{background:rgba(192,132,252,.15);color:#e9d5ff;border-color:rgba(192,132,252,.2)}
+.tag-gold{background:rgba(255,179,71,.15);color:#fde68a;border-color:rgba(255,179,71,.2)}
+
+/* ===== 进度条 ===== */
+.bar-wrap{background:rgba(255,255,255,.06);border-radius:20px;height:8px;overflow:hidden;margin:.6rem 0}
+.bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#f472b6,#c084fc);transition:width .4s}
+.bar.green{background:linear-gradient(90deg,#34d399,#6ee7b7)}
+.bar.red{background:linear-gradient(90deg,#f87171,#fca5a5)}
+
+/* ===== 数值表 ===== */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.04);gap:1rem}
+.stat-row:last-child{border-bottom:none}
+.stat-label{color:#b8c4e0;font-size:.88rem;flex-shrink:0}
+.stat-value{font-weight:700;color:#eef2ff;font-size:.88rem;text-align:right}
+code{
+    font-family:'JetBrains Mono',monospace;font-size:.82rem;
+    background:rgba(255,255,255,.06);padding:.15rem .45rem;border-radius:6px;color:#e9d5ff;
+}
+
+/* ===== 职业/母体小卡片 ===== */
+.mini-card{
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+    border-radius:22px;padding:1.2rem;transition:all .4s;
+}
+.mini-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);transform:translateY(-3px)}
+.mini-card h4{font-size:1rem;font-weight:700;margin-bottom:.4rem}
+.mini-card .skill{color:#a5b4fc;font-size:.82rem;margin-bottom:.3rem}
+.mini-card p{color:#8b95b0;font-size:.8rem;line-height:1.6}
+
+/* ===== 时间线 ===== */
+.timeline{position:relative;padding-left:1.8rem}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:rgba(255,255,255,.08)}
+.timeline-item{position:relative;margin-bottom:1.5rem}
+.timeline-item::before{
+    content:'';position:absolute;left:-1.8rem;top:.35rem;width:10px;height:10px;
+    border-radius:50%;background:#c084fc;box-shadow:0 0 12px rgba(192,132,252,.5);
+}
+.timeline-item h4{font-size:.95rem;font-weight:700;margin-bottom:.2rem}
+.timeline-item p{color:#8b95b0;font-size:.85rem}
+
+/* ===== 命令表 ===== */
+.cmd-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.cmd-table th{text-align:left;padding:.7rem .8rem;color:#8b95b0;font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px}
+.cmd-table td{padding:.6rem .8rem;border-bottom:1px solid rgba(255,255,255,.04);color:#c8d0e8}
+.cmd-table tr:last-child td{border-bottom:none}
+.cmd-table tr:hover td{background:rgba(255,255,255,.02)}
+
+/* ===== 页脚 ===== */
+.footer{text-align:center;padding:3rem 1rem;color:#6b7490;font-size:.8rem;border-top:1px solid rgba(255,255,255,.04);margin-top:3rem}
+.footer a{color:#a5b4fc;text-decoration:none}
+
+@media(max-width:700px){
+    .hero h1{font-size:2.2rem}
+    .nav-links{display:none}
+    .grid-2col,.grid-3col,.grid-4col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- 导航 -->
+<nav class="navbar">
+<div class="nav-content">
+    <div class="logo"><span class="ghg">GHG</span> <span class="rainbow">HunterGame</span></div>
+    <div class="nav-links">
+        <a href="#flow">对局流程</a>
+        <a href="#altar">法阵</a>
+        <a href="#sacrifice">法阵献祭</a>
+        <a href="#roles">逃生者职业</a>
+        <a href="#mother">母体种类</a>
+        <a href="#items">道具</a>
+        <a href="#reward">奖池</a>
+        <a href="#commands">命令</a>
+    </div>
+</div>
+</nav>
+
+<div class="container">
+
+<!-- Hero -->
+<header class="hero">
+    <h1>GHG · Gost's HunterGame</h1>
+    <p class="sub">PvE 逃亡玩法：AI 母体在猎场中追杀，逃生者一座座推开法阵，全部推满后冲向撤离点。玩法灵感来自《黎明杀机》与《第五人格》，代码基础部分取自 Gost，后续版本会做代码审计清掉遗留部分。</p>
+    <div class="badges">
+        <span class="badge badge-accent"><i class="fas fa-code-branch"></i> v1.0.0 · 开发中</span>
+        <span class="badge badge-blue"><i class="fas fa-cube"></i> 1 母体 vs 最多 4 逃生者</span>
+        <span class="badge badge-green"><i class="fas fa-layer-group"></i> 独立 jar · 可与 Gost 并存</span>
+        <span class="badge"><i class="fas fa-clock"></i> 单局上限 900 秒</span>
+        <span class="badge badge-gold"><i class="fas fa-language"></i> 中英双语 · 6 种语言</span>
+    </div>
+    <div class="hero-links">
+        <a class="hero-btn" href="#flow"><i class="fas fa-play"></i> 一局的完整流程</a>
+        <a class="hero-btn secondary" href="#commands"><i class="fas fa-terminal"></i> 命令一览</a>
+    </div>
+</header>
+
+<!-- ========== 1. 对局流程 ========== -->
+<section class="section" id="flow">
+    <h2 class="section-title"><i class="fas fa-route" style="color:#c084fc;margin-right:.5rem"></i>一局的完整流程</h2>
+
+    <div class="grid-2col">
+        <!-- 0. 排队 -->
+        <div class="card" style="background:rgba(59,130,246,.06)!important;border-left:3px solid rgba(59,130,246,.4)!important">
+            <h3 style="font-size:1.15rem;margin-bottom:.6rem"><span class="tag tag-blue">0</span> 排队开局 · <code>/ghg join</code></h3>
+            <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:.8rem">屏幕上方一条蓝色 BossBar 实时显示排队人数与剩余秒数。凑够 <code>min-players</code>（默认 2 人）自动进入 <code>countdown-seconds</code>（15 秒）倒计时，人不够退回凑人阶段，最长等 <code>wait-seconds</code>（90 秒）后取消。队列不收钱，入场费在真正开局时收。</p>
+            <div class="stat-row"><span class="stat-label">默认母体</span><span class="stat-value">AI（<code>queue.mother: AI</code>）</span></div>
+            <div class="stat-row"><span class="stat-label">PLAYER 模式</span><span class="stat-value">从队列随机抽一人当母体，不看入队顺序</span></div>
+            <div class="stat-row"><span class="stat-label">对局已开局</span><span class="stat-value">提示用 <code>/ghg spectate</code> 观战</span></div>
+            <div class="stat-row"><span class="stat-label">管理员手动开局</span><span class="stat-value">队列自动作废</span></div>
+        </div>
+
+        <!-- 1. 准备阶段 -->
+        <div class="card card-gold">
+            <h3 style="font-size:1.15rem;margin-bottom:.6rem"><span class="tag tag-gold">1</span> 准备阶段 · 25 秒</h3>
+            <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:.8rem">人类自由移动、踩点、看地形；<strong style="color:#ffb7b7">法阵无法破除</strong>，母体定身。逃生者选职业，玩家母体选种类。道具箱已在场上，可以敲开搜刮。</p>
+            <div class="stat-row"><span class="stat-label">道具</span><span class="stat-value">一律锁定，开打才解锁</span></div>
+            <div class="stat-row"><span class="stat-label">饱食度</span><span class="stat-value">顶满，开打压回 <code>start-saturation</code>（5）</span></div>
+            <div class="stat-row"><span class="stat-label">选择面板（钟表）</span><span class="stat-value">左/右键打开菜单，开打收走</span></div>
+            <div class="stat-row"><span class="stat-label">最后 5 秒</span><span class="stat-value">锁母体种类 + 居中倒计时</span></div>
+        </div>
+
+        <!-- 2. 猎杀 -->
+        <div class="card card-ghost">
+            <h3 style="font-size:1.15rem;margin-bottom:.6rem"><span class="tag tag-red">2</span> 猎杀阶段</h3>
+            <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:.8rem">母体解定身开始追。逃生者<strong>按住 Shift</strong> 站在法阵格上蓄力，每座阵有独立进度条。实际涨速 = 基准 <code>1.8%/秒</code> × 0.9 × 前 2 名蓄力者职业权重之和。</p>
+            <div class="bar-wrap"><div class="bar" style="width:62%"></div></div>
+            <div class="stat-row"><span class="stat-label">单人普通职业</span><span class="stat-value">约 62 秒推满一座（1.62%/s）</span></div>
+            <div class="stat-row"><span class="stat-label">工程师单人</span><span class="stat-value">约 49 秒（2.03%/s）</span></div>
+            <div class="stat-row"><span class="stat-label">两人同推</span><span class="stat-value">约 31 秒</span></div>
+            <div class="stat-row"><span class="stat-label">母体守机</span><span class="stat-value">6 格内 −1.5%/s → 净 +0.12%/s</span></div>
+        </div>
+
+        <!-- 3. 撤离 -->
+        <div class="card card-human">
+            <h3 style="font-size:1.15rem;margin-bottom:.6rem"><span class="tag tag-green">3</span> 撤离阶段</h3>
+            <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:.8rem">全部法阵破除后，从刚破的阵中<strong>随机挑一座</strong>当撤离点（不会是最后破除的那座）。按住 Shift 待满 <code>escape.hold-seconds</code>（4 秒）撤离成功。</p>
+            <div class="stat-row"><span class="stat-label">终局倒计时</span><span class="stat-value"><code>endgame.seconds</code>（90 秒）</span></div>
+            <div class="stat-row"><span class="stat-label">独狼地窖</span><span class="stat-value">剩 1 人时开放，点位是随机一座法阵</span></div>
+            <div class="stat-row"><span class="stat-label">一个人走出去</span><span class="stat-value">整局收尾，存活者一起算撤离成功</span></div>
+        </div>
+    </div>
+
+    <!-- 观战席 -->
+    <div class="card" style="margin-top:1.5rem;background:rgba(59,130,246,.05)!important;border:1px solid rgba(59,130,246,.12)!important">
+        <h3 style="font-size:1rem;margin-bottom:.6rem"><i class="fas fa-eye" style="color:#b8d0ff"></i> 观战席 · <code>/ghg spectate</code></h3>
+        <p style="color:#b8c4e0;font-size:.88rem">对局进行中可旁观，<strong>只能在猎场 X/Z 边界外 10 格内活动</strong>（<code>hunter.spectate.margin</code>），越界被按住。<strong>已被淘汰的人也受同一限制</strong>。准备阶段点了会提示「没有正在进行的对局」。</p>
+    </div>
+</section>
+
+<!-- ========== 2. 交互 ========== -->
+<section class="section" id="interact">
+    <h2 class="section-title"><i class="fas fa-hand-pointer" style="color:#6ee7b7;margin-right:.5rem"></i>交互全部用 Shift</h2>
+    <div class="card" style="padding:0;overflow:hidden">
+        <table class="cmd-table">
+            <thead><tr><th>动作</th><th>操作</th></tr></thead>
+            <tbody>
+                <tr><td>破法阵</td><td>站在法阵格里 <strong>按住 Shift</strong></td></tr>
+                <tr><td>救援倒地队友 / 拆阵救人</td><td>蹲在旁边 <strong>按住 Shift</strong>，连续待满数秒</td></tr>
+                <tr><td>治疗受伤队友</td><td>蹲在旁边 <strong>按住 Shift</strong>（8 秒）</td></tr>
+                <tr><td>自愈（受伤）</td><td>自己蹲下 <strong>按住 Shift</strong>（20 秒，饱食度 ≥ 8）</td></tr>
+                <tr><td>撤离</td><td>站在撤离点 <strong>按住 Shift</strong> 待满 4 秒</td></tr>
+                <tr><td>母体抱起倒地者</td><td>贴到 2.5 格内 <strong>按住 Shift</strong> 2 秒（AI 自动抱）</td></tr>
+                <tr><td>从母体手里挣脱</td><td>被抱着时 <strong>按住 Shift</strong> 攒满 8 秒</td></tr>
+                <tr><td>母体砍击</td><td><strong>左键</strong>（手持「母体的战斧」）</td></tr>
+                <tr><td>母体放技能</td><td><strong>右键</strong>（手持对应技能道具）</td></tr>
+                <tr><td>母体加固法阵</td><td>玩家母体<strong>左键连打碎 16 次</strong>粉红色染色玻璃</td></tr>
+                <tr><td>工程师架栅栏</td><td><strong>右键</strong>（栅栏工具）</td></tr>
+                <tr><td>用道具</td><td><strong>右键</strong>；准备阶段全部禁用</td></tr>
+                <tr><td>重选职业 / 母体种类</td><td>准备阶段手里那块<strong>钟表</strong>：左键或右键</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ========== 3. 法阵 ========== -->
+<section class="section" id="altar">
+    <h2 class="section-title"><i class="fas fa-circle-nodes" style="color:#f472b6;margin-right:.5rem"></i>法阵系统</h2>
+
+    <div class="grid-2col">
+        <div class="card">
+            <h3 style="font-size:1.1rem;margin-bottom:.8rem"><i class="fas fa-gauge-high" style="color:#f472b6"></i> 每座阵一条独立进度</h3>
+            <p style="color:#b8c4e0;font-size:.88rem;margin-bottom:.8rem">站哪座推哪座，涨满 100% 那座阵破除。<strong>全部破除之后</strong>撤离点才开。「推哪座」是一道取舍题：分散推分摊风险，集中推先拿下一座。</p>
+            <div class="stat-row"><span class="stat-label">默认数量</span><span class="stat-value"><code>altar.count: 4</code>（1–8；0 = 随人数）</span></div>
+            <div class="stat-row"><span class="stat-label">同时蓄力上限</span><span class="stat-value"><code>max-chargers: 2</code>（前 2 名权重相加）</span></div>
+            <div class="stat-row"><span class="stat-label">第 3 个人</span><span class="stat-value">提示「这座阵已经满了」</span></div>
+            <div class="stat-row"><span class="stat-label">蓄力滴答</span><span class="stat-value">每 0.5 秒一记「哒」，音高随进度上抬</span></div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size:1.1rem;margin-bottom:.8rem"><i class="fas fa-triangle-exclamation" style="color:#fca5a5"></i> 瘫痪</h3>
+            <p style="color:#b8c4e0;font-size:.88rem;margin-bottom:.8rem">单座阵第一次跨过 <code>paralyze.at</code>（默认 20%）时，这座阵停 <code>paralyze.seconds</code>（60 秒）：不能推、破阵石无效、<strong>母体也不能加固</strong>。地砖变灰色玻璃，一眼可辨。</p>
+            <div class="stat-row"><span class="stat-label">触发时机</span><span class="stat-value">每座阵只触发一次</span></div>
+            <div class="stat-row"><span class="stat-label">破阵石加速期间</span><span class="stat-value">不瘫痪；加速结束立刻补触发</span></div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size:1.1rem;margin-bottom:.8rem"><i class="fas fa-hammer" style="color:#fde68a"></i> 加固（玩家母体专属）</h3>
+            <p style="color:#b8c4e0;font-size:.88rem;margin-bottom:.8rem">玩家母体连续打碎粉红色染色玻璃 <code>harden-hits</code>（16 次）→ 该格变哭泣的黑曜石，这座阵<strong>加固 50 秒</strong>，人类站上去不涨、破阵石无效。中断超过 10 秒重新数；加固后 <strong>60 秒冷却</strong>。AI 母体不做这个动作。</p>
+            <div class="stat-row"><span class="stat-label">加固时长</span><span class="stat-value"><code>harden-seconds: 50</code></span></div>
+            <div class="stat-row"><span class="stat-label">冷却</span><span class="stat-value"><code>harden-cooldown-seconds: 60</code></span></div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size:1.1rem;margin-bottom:.8rem"><i class="fas fa-location-dot" style="color:#b8d0ff"></i> 坐标通报 & 撤离点</h3>
+            <p style="color:#b8c4e0;font-size:.88rem;margin-bottom:.8rem">每 <code>locator.interval-seconds</code>（60 秒）把未完成法阵的坐标发给所有逃生者，并打一道光柱。撤离点<strong>开局不存在</strong>，全部破完后随机挑一座刚破的阵（排除最后破除的那座）。</p>
+            <div class="stat-row"><span class="stat-label">撤离读条</span><span class="stat-value">按住 Shift 4 秒</span></div>
+            <div class="stat-row"><span class="stat-label">地窖</span><span class="stat-value">剩 1 人开放，点位随机一座法阵</span></div>
+        </div>
+    </div>
+
+    <!-- 进度条示意 -->
+    <div class="card" style="margin-top:1.5rem;background:rgba(244,114,182,.05)!important;border:1px solid rgba(244,114,182,.15)!important">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+            <span style="font-weight:700;font-size:.95rem"><i class="fas fa-chart-simple" style="color:#f472b6"></i> BossBar · 所有逃生者 + 玩家母体可见</span>
+            <span class="tag tag-purple">法阵破除 1/4 (37%)</span>
+        </div>
+        <div class="bar-wrap"><div class="bar" style="width:37%"></div></div>
+        <p style="color:#8b95b0;font-size:.82rem;margin-top:.6rem">左边是已破除/总数，右边是所有阵的平均进度。全破后变绿：<strong style="color:#6ee7b7">「法阵全破 —— 去逃脱点撤离」</strong>。</p>
+    </div>
+</section>
+
+<!-- ========== 4. 法阵献祭 ========== -->
+<section class="section" id="sacrifice">
+    <h2 class="section-title"><i class="fas fa-fire" style="color:#fca5a5;margin-right:.5rem"></i>法阵献祭：钉在法阵上</h2>
+
+    <div class="card card-ghost" style="margin-bottom:1.5rem">
+        <p style="color:#e0b0b0;font-size:.95rem;margin-bottom:1rem"><i class="fas fa-info-circle"></i> 倒地之后不再是「躺着等放血」，而是被母体<strong>抱到法阵上钉住</strong>——人一钉上去，<strong style="color:#ffb7b7">这座法阵立刻失效</strong>。这是 GHG 里唯一的淘汰途径（<code>hunter.chair.enabled: false</code> 才退回放血规则）。</p>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>击倒（趴下）</h4>
+                <p>母体打中两次 → 原地趴下，无法移动，持续发光 4 秒。</p>
+            </div>
+            <div class="timeline-item">
+                <h4>抱起 / 骑乘</h4>
+                <p>玩家母体按住 Shift 贴 2.5 格内 2 秒；AI 母体主动走向 24 格内倒地者。抱着人时移速 ×0.75。</p>
+            </div>
+            <div class="timeline-item">
+                <h4>钉上法阵</h4>
+                <p>走到任意未完成法阵 2.5 格内自动钉上。<strong>该法阵随即失效</strong>，开始倒计时：第一次 60 秒 / 第二次 30 秒 / 第三次 5 秒后爆炸放飞。</p>
+            </div>
+            <div class="timeline-item">
+                <h4>拆阵救人 或 升天</h4>
+                <p>队友在法阵旁按住 Shift 4 秒拆阵救下，法阵恢复；没人处理则倒计时归零 → 升天淘汰。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-3col">
+        <div class="mini-card">
+            <h4><i class="fas fa-stopwatch" style="color:#fca5a5"></i> 上阵倒计时</h4>
+            <div class="stat-row"><span class="stat-label">第一次</span><span class="stat-value">60 秒</span></div>
+            <div class="stat-row"><span class="stat-label">第二次</span><span class="stat-value">30 秒</span></div>
+            <div class="stat-row"><span class="stat-label">第三次</span><span class="stat-value">5 秒后爆炸</span></div>
+        </div>
+        <div class="mini-card">
+            <h4><i class="fas fa-people-arrows" style="color:#6ee7b7"></i> 救援与挣扎</h4>
+            <div class="stat-row"><span class="stat-label">拆阵救人</span><span class="stat-value">按住 Shift 4 秒</span></div>
+            <div class="stat-row"><span class="stat-label">自己挣脱</span><span class="stat-value">被抱时 Shift 8 秒</span></div>
+            <div class="stat-row"><span class="stat-label">救下状态</span><span class="stat-value">受伤（不是满血）</span></div>
+        </div>
+        <div class="mini-card">
+            <h4><i class="fas fa-user-shield" style="color:#fde68a"></i> 兜底</h4>
+            <div class="stat-row"><span class="stat-label">倒地自愈</span><span class="stat-value">15 秒没人处理 → 受伤</span></div>
+            <div class="stat-row"><span class="stat-label">救援保护</span><span class="stat-value">救下后 3 秒母体砍不动</span></div>
+            <div class="stat-row"><span class="stat-label">每人每局最多被救</span><span class="stat-value">1 次</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 5. 逃生者职业 ========== -->
+<section class="section" id="roles">
+    <h2 class="section-title"><i class="fas fa-user-group" style="color:#6ee7b7;margin-right:.5rem"></i>逃生者职业</h2>
+    <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:1.2rem;max-width:800px">每局随机一个职业，准备阶段自动弹菜单（也能 <code>/ghg role</code>）。换职业按<strong>差价</strong>补/退职业券。职业技能道具只由职业补发，不会从道具箱开出，<strong>用掉之后才开始计时补发</strong>。</p>
+
+    <div class="grid-3col">
+        <div class="mini-card">
+            <h4><span class="tag tag-blue">ICER</span> 冰球手</h4>
+            <p class="skill">凝冰球 · 冷却 55 秒</p>
+            <p>砸中母体眩晕 4 秒并让她松手。AI 母体局不分配（没有目标可砸）。</p>
+            <p style="margin-top:.5rem;color:#fde68a">职业券 80</p>
+        </div>
+        <div class="mini-card">
+            <h4><span class="tag tag-green">GUARDIAN</span> 守护者</h4>
+            <p class="skill">救赎护符 · 冷却 45 秒</p>
+            <p>15 秒内救人读条 ×3；被动救援/治疗读条 ×1.3。</p>
+            <p style="margin-top:.5rem;color:#fde68a">职业券 60</p>
+        </div>
+        <div class="mini-card">
+            <h4><span class="tag tag-red">LANCER</span> 突击手</h4>
+            <p class="skill">冲刺矛 · 冷却 40 秒</p>
+            <p>短距突进约 7–8 格（初速 1.6）；被动心跳听距 ×1.5。</p>
+            <p style="margin-top:.5rem;color:#fde68a">职业券 60</p>
+        </div>
+        <div class="mini-card">
+            <h4><span class="tag tag-gold">ENGINEER</span> 工程师</h4>
+            <p class="skill">栅栏工具 · 冷却 45 秒</p>
+            <p>右键架一段 3×2 木栅栏；被动破阵蓄力上限 ×1.25（2.03%/秒）。</p>
+            <p style="margin-top:.5rem;color:#fde68a">职业券 40</p>
+        </div>
+        <div class="mini-card">
+            <h4><span class="tag tag-green">RUNNER</span> 跑者</h4>
+            <p class="skill">肾上腺素 · 冷却 35 秒</p>
+            <p>速度Ⅰ 4 秒，之后 2 秒缓慢（弱化版）。</p>
+            <p style="margin-top:.5rem;color:#fde68a">职业券 40</p>
+        </div>
+        <div class="mini-card">
+            <h4><span class="tag tag-purple">WRAITH</span> 黑衣人</h4>
+            <p class="skill">隐身斗篷 · 冷却 40 秒</p>
+            <p>隐身 6 秒；母体静止 3 秒的被动透视仍能看到轮廓，是「躲视线」不是「无解消失」。</p>
+            <p style="margin-top:.5rem;color:#fde68a">职业券 50</p>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 6. 母体种类 ========== -->
+<section class="section" id="mother">
+    <h2 class="section-title"><i class="fas fa-dragon" style="color:#f87171;margin-right:.5rem"></i>母体：八种种类，一人一个技能</h2>
+    <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:1.2rem;max-width:820px">AI 母体与玩家母体共用同一套实现。玩家母体技能<strong>按准星方向</strong>判定；AI 母体由 <code>MotherBrain</code> 传入目标、朝那个人打。种类在准备阶段选定，默认 <code>RANDOM</code> 从 <code>enabled-kinds</code> 随机抽。技能道具<strong>用掉即消失，冷却走完才补回</strong>；斧头独立，砍出 3 秒后回手——回收只补斧头，技能道具等自己的 CD。</p>
+
+    <div class="grid-4col">
+        <div class="mini-card"><h4><span class="tag tag-red">SPRINTER</span> 疾行者</h4><p class="skill">疾跑 · CD 20 秒</p><p>自身速度Ⅰ 6 秒。免费。</p></div>
+        <div class="mini-card"><h4><span class="tag tag-red">CHARGER</span> 冲撞者</h4><p class="skill">冲刺 · CD 16 秒</p><p>力度 2.6（约 8–9 格），1.6 秒窗口内撞到人 → 眩晕 2 秒。母体自己无 debuff。门票 100。</p></div>
+        <div class="mini-card"><h4><span class="tag tag-gold">ARCHER</span> 射手</h4><p class="skill">箭矢 · CD 16 秒</p><p>纯受击型：命中即正常受击一次，<strong>不给减速</strong>。门票 120。</p></div>
+        <div class="mini-card"><h4><span class="tag tag-green">ALCHEMIST</span> 炼金者</h4><p class="skill">弩箭 · CD 18 秒</p><p>命中位置炸喷溅药水，半径 3 格缓慢Ⅰ 3 秒。门票 100。</p></div>
+        <div class="mini-card"><h4><span class="tag tag-purple">WALKER</span> 穿隙者</h4><p class="skill">传送 · CD 28 秒</p><p>玩家朝准星闪最多 8 格；AI 传到目标身后 1.8 格。自己硬直 2 秒。门票 150。</p></div>
+        <div class="mini-card"><h4><span class="tag tag-purple">WATCHER</span> 窥视者</h4><p class="skill">隐身 · CD 28 秒</p><p>隐身 + 速度Ⅱ 7 秒；打中逃生者后加速立刻消失（隐身保留）。门票 180。</p></div>
+        <div class="mini-card"><h4><span class="tag tag-green">WEAVER</span> 缚网者</h4><p class="skill">缚网 · CD 18 秒</p><p>以自身为中心半径 7 格缓慢Ⅰ 3 秒。门票 120。</p></div>
+        <div class="mini-card"><h4><span class="tag tag-blue">PEARL_LADY</span> 珍珠女士</h4><p class="skill">珍珠传送 · CD 24 秒</p><p>朝准星闪最多 10 格，落地自己缓慢Ⅰ 4 秒；这 4 秒内打中人 → 缓慢解除。门票 160。</p></div>
+    </div>
+
+    <!-- 共用被动 -->
+    <div class="collapsible" style="margin-top:1.5rem">
+        <div class="collapsible-header" onclick="toggle(this)">
+            <span><i class="fas fa-shield-halved" style="color:#fca5a5"></i> 所有母体共用的被动</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-content">
+            <div class="stat-row"><span class="stat-label">透视（不动时）</span><span class="stat-value">站住 3 秒后，40 格内逃生者发光；一动就断</span></div>
+            <div class="stat-row"><span class="stat-label">基础移速</span><span class="stat-value">0.26（原版僵尸 0.23）</span></div>
+            <div class="stat-row"><span class="stat-label">攻击距离 / 冷却</span><span class="stat-value">2.2 格 / 4 秒（同时是斧子的战斗冷却）</span></div>
+            <div class="stat-row"><span class="stat-label">索敌半径</span><span class="stat-value">60 格</span></div>
+            <div class="stat-row"><span class="stat-label">卡视野</span><span class="stat-value">墙后看不见就不追（破阵声音 20 格内除外；6 格内一定看见）</span></div>
+            <div class="stat-row"><span class="stat-label">够不着就不追</span><span class="stat-value">目标高 3 格以上时放弃</span></div>
+            <div class="stat-row"><span class="stat-label">命中要视线</span><span class="stat-value">隔着墙 / 栅栏不会凭空打中</span></div>
+            <div class="stat-row"><span class="stat-label">绕后</span><span class="stat-value">目标背对且 4–12 格时绕侧后方（同目标只绕一次）</span></div>
+            <div class="stat-row"><span class="stat-label">假动作</span><span class="stat-value">目标盯着你时 35% 概率横窜一下（CD 12 秒）</span></div>
+            <div class="stat-row"><span class="stat-label">命中后摇</span><span class="stat-value">母体缓慢Ⅳ 2 秒；斧头消失，3 秒后回手（只回斧头）</span></div>
+            <div class="stat-row"><span class="stat-label">跳跃提升（仅 AI）</span><span class="stat-value">跳跃提升Ⅲ ≈ 3 格，每 3 秒续一次</span></div>
+            <div class="stat-row"><span class="stat-label">卡住自动脱困</span><span class="stat-value">4 格内持续 <strong>3 秒</strong> → 原地 2–3 格挤出去，绝不瞬移</span></div>
+            <div class="stat-row"><span class="stat-label">追击手感</span><span class="stat-value">Pathfinder 追「0.5 秒后预判点」（<code>chase.*</code>），失败退回原版直追</span></div>
+            <div class="stat-row"><span class="stat-label">AI 决策频率</span><span class="stat-value">追击单独 10 刻一拍，砍人 / 放技能 / 椅子逻辑仍 1 秒一拍</span></div>
+        </div>
+    </div>
+
+    <!-- 测试局 -->
+    <div class="collapsible">
+        <div class="collapsible-header" onclick="toggle(this)">
+            <span><i class="fas fa-flask" style="color:#b8d0ff"></i> 测试局与假人</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-content">
+            <p style="color:#b8c4e0;font-size:.88rem;margin-bottom:.8rem"><code>/ghga test</code> 自己当唯一逃生者；<code>/ghga test mother</code> 自己当母体，人类侧用会跑的测试假人代替。<strong>测试局不收费、不进统计、不参与分配</strong>。</p>
+            <div class="stat-row"><span class="stat-label">假人驱动</span><span class="stat-value">关原版 AI，插件<strong>每刻</strong>推一次速度</span></div>
+            <div class="stat-row"><span class="stat-label">逃跑触发</span><span class="stat-value"><code>dummy-flee-range</code> 14 格 → 反方向跑 8 格</span></div>
+            <div class="stat-row"><span class="stat-label">不是无敌</span><span class="stat-value">监听器 setCancelled，有击退 / 粒子 / 受击音</span></div>
+            <div class="stat-row"><span class="stat-label">倒地</span><span class="stat-value">打够 <code>dummy-hits</code> 2 下，1 秒后补新假人</span></div>
+            <div class="stat-row"><span class="stat-label">忽略技能冷却</span><span class="stat-value">仅对玩家母体生效（AI 在任何模式下都吃 CD）</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 7. 道具 ========== -->
+<section class="section" id="items">
+    <h2 class="section-title"><i class="fas fa-box-open" style="color:#fde68a;margin-right:.5rem"></i>道具与物资</h2>
+    <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:1.2rem">道具只从<strong>道具箱</strong>出。箱子是西瓜，敲 5 下破，开 2 件，都从随机池抽（口粮不再保底）。职业技能道具<strong>不进箱子</strong>。</p>
+
+    <div class="grid-3col">
+        <div class="mini-card"><h4><i class="fas fa-bread-slice" style="color:#fde68a"></i> 应急口粮</h4><p>面包 · 按住右键真吃，每口回 6 饱食 + 4 饱和；可叠成一摞，不再保底但权重 ×4。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-briefcase-medical" style="color:#6ee7b7"></i> 医疗包</h4><p>蜂蜜瓶 · 右键立刻治好受伤。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-gem" style="color:#c084fc"></i> 破阵石</h4><p>燧石 · 站法阵上右键，脚下这座阵速度 ×2 持续 20 秒；CD 30 秒。加速期间不瘫痪。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-clock" style="color:#b8d0ff"></i> 控魂术</h4><p>时钟 · 定身母体 4 秒，CD 25 秒。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-eye" style="color:#c084fc"></i> 传送珍珠</h4><p>末影珍珠 · 右键投掷传送，CD 10 秒。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-feather" style="color:#6ee7b7"></i> 漂浮药水</h4><p>滞留药水 · 漂浮 6 秒/Ⅱ，无冷却，靠瓶数限速；池子里权重 ×3。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-snowflake" style="color:#b8d0ff"></i> 凝冰球（通用）</h4><p>雪球 · 无冷却；砸母体眩晕 4 秒并松手，砸逃生者减速。和冰球手职业道具独立。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-bolt" style="color:#fde68a"></i> 眩晕药水</h4><p>喷溅药水 · 砸中母体定身 1.5 秒，期间不能移动/放技能/敲箱；没砸到白费。</p></div>
+        <div class="mini-card"><h4><i class="fas fa-drumstick-bite" style="color:#f87171"></i> 臭牛排</h4><p>熟牛肉 · 按住右键真吃，给速度Ⅰ 6 秒 + 自己发光 5 秒（代价），补 3 饱食 + 1 饱和。</p></div>
+    </div>
+
+    <div class="collapsible" style="margin-top:1.2rem">
+        <div class="collapsible-header" onclick="toggle(this)">
+            <span><i class="fas fa-skull" style="color:#f87171"></i> 母体开箱专属池</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-content">
+            <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:.8rem">母体开箱<strong>每箱只给一件</strong>，池子是母体专属（狂暴药水 / 灵魂探测器）+ 人鬼通用（冲刺矛 / 凝冰球 / 传送珍珠 / 漂浮药水）。不会混入人类道具。</p>
+            <div class="stat-row"><span class="stat-label">狂暴药水</span><span class="stat-value">速度Ⅱ 10 秒</span></div>
+            <div class="stat-row"><span class="stat-label">灵魂探测器</span><span class="stat-value">25 秒内所有玩家发光，CD 35 秒</span></div>
+            <div class="stat-row"><span class="stat-label">不可丢弃</span><span class="stat-value">母体专属 + 技能道具 + 战斧</span></div>
+        </div>
+    </div>
+
+    <div class="collapsible">
+        <div class="collapsible-header" onclick="toggle(this)">
+            <span><i class="fas fa-clock" style="color:#fde68a"></i> 选择面板（准备阶段专属）</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-content">
+            <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:.8rem">每人手里一块钟表，<strong>左键或右键</strong>都能打开菜单：逃生者＝职业菜单，玩家母体＝母体种类菜单。关掉 UI 之后不用再敲命令。<strong>不能丢，开打自动收走</strong>，不进箱子。</p>
+            <div class="stat-row"><span class="stat-label">逃生者</span><span class="stat-value">职业菜单（<code>/ghg role</code> 等价）</span></div>
+            <div class="stat-row"><span class="stat-label">玩家母体</span><span class="stat-value">种类菜单（<code>/ghg kind</code> 等价）</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 8. 奖池 ========== -->
+<section class="section" id="reward">
+    <h2 class="section-title"><i class="fas fa-coins" style="color:#fde68a;margin-right:.5rem"></i>奖池与结算</h2>
+    <p style="color:#b8c4e0;font-size:.9rem;margin-bottom:1.2rem;max-width:800px">奖金只看<strong>每个人做了什么</strong>，不看哪一方赢。奖池（入场费 + 服务器保底）按行动分占比分给所有真人玩家，玩家母体也是参与者。</p>
+
+    <div class="grid-2col">
+        <div class="card">
+            <h3 style="font-size:1rem;margin-bottom:.8rem"><i class="fas fa-running" style="color:#6ee7b7"></i> 逃生者行动分</h3>
+            <div class="stat-row"><span class="stat-label">每秒破阵</span><span class="stat-value">2.0 / 秒</span></div>
+            <div class="stat-row"><span class="stat-label">每次成功救人</span><span class="stat-value">15.0</span></div>
+            <div class="stat-row"><span class="stat-label">成功撤离（额外）</span><span class="stat-value">25.0</span></div>
+        </div>
+        <div class="card">
+            <h3 style="font-size:1rem;margin-bottom:.8rem"><i class="fas fa-skull" style="color:#f87171"></i> 母体行动分</h3>
+            <div class="stat-row"><span class="stat-label">每次命中</span><span class="stat-value">5.0</span></div>
+            <div class="stat-row"><span class="stat-label">每次击倒</span><span class="stat-value">10.0</span></div>
+            <div class="stat-row"><span class="stat-label">每淘汰一人</span><span class="stat-value">40.0</span></div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:1.2rem;background:rgba(255,179,71,.05)!important;border:1px solid rgba(255,179,71,.12)!important">
+        <div class="grid-2col" style="gap:1rem">
+            <div>
+                <div class="stat-row"><span class="stat-label">入场费</span><span class="stat-value">每人 50</span></div>
+                <div class="stat-row"><span class="stat-label">服务器保底</span><span class="stat-value">500</span></div>
+            </div>
+            <div>
+                <div class="stat-row"><span class="stat-label">两池制</span><span class="stat-value">入场费只在逃生者间分；母体只分保底，封顶 50%</span></div>
+                <div class="stat-row"><span class="stat-label">时间到判平局</span><span class="stat-value">不计入任何一方胜场，奖金照发</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 9. 命令 ========== -->
+<section class="section" id="commands">
+    <h2 class="section-title"><i class="fas fa-terminal" style="color:#a5b4fc;margin-right:.5rem"></i>命令与权限</h2>
+
+    <!-- 图形菜单 -->
+    <div class="collapsible">
+        <div class="collapsible-header" onclick="toggle(this)">
+            <span><i class="fas fa-table-cells-large" style="color:#c084fc"></i> 不想记命令就用 <code>/ghg</code> 图形菜单</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-content">
+            <p style="color:#b8c4e0;font-size:.88rem;margin-bottom:.8rem">不带参数就是图形菜单，基岩版玩家直接点。结构是「主菜单 → 板块 → 详细功能」：</p>
+            <div class="stat-row"><span class="stat-label">我的状态</span><span class="stat-value">阶段 / 职业 / 种类 / 排队人数 / 奖池</span></div>
+            <div class="stat-row"><span class="stat-label">对战</span><span class="stat-value">排队 / 退出 / 状态；管理员多「立即开局」</span></div>
+            <div class="stat-row"><span class="stat-label">职业图鉴</span><span class="stat-value">六种职业全列，准备阶段点一下直接换</span></div>
+            <div class="stat-row"><span class="stat-label">母体种类图鉴</span><span class="stat-value">八种母体逐个展开，准备阶段直接选</span></div>
+            <div class="stat-row"><span class="stat-label">游戏流程</span><span class="stat-value">四页说明：流程 / 交互 / 击倒与献祭 / 分钱</span></div>
+            <div class="stat-row"><span class="stat-label">语言</span><span class="stat-value">六种语言点一下就切</span></div>
+            <div class="stat-row"><span class="stat-label">管理员调试</span><span class="stat-value">24 个数值加减 + 热重载 + 强制收局（仅 <code>ghg.admin</code>）</span></div>
+            <p style="color:#8b95b0;font-size:.82rem;margin-top:.8rem">菜单动作走 <code>performCommand</code>，<strong>行为与命令完全一致</strong>，不存在第二套逻辑。管理员调试板块用原始配置键当名字（如 <code>hunter.duration</code>），改完立刻写进 <code>config.yml</code> 并落盘。</p>
+        </div>
+    </div>
+
+    <div class="collapsible">
+        <div class="collapsible-header" onclick="toggle(this)">
+            <span><i class="fas fa-user" style="color:#6ee7b7"></i> 玩家命令</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-content">
+            <table class="cmd-table">
+                <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                <tbody>
+                    <tr><td><code>/ghg</code></td><td>打开图形菜单（<code>/ghg menu</code> 等价）</td></tr>
+                    <tr><td><code>/ghg join</code></td><td>排队开局</td></tr>
+                    <tr><td><code>/ghg leave</code></td><td>退出对局 / 排队 / 观战；被淘汰者先结算再走</td></tr>
+                    <tr><td><code>/ghg spectate</code>（<code>spec</code> / <code>watch</code>）</td><td>进/出观战席（仅对局进行中）</td></tr>
+                    <tr><td><code>/ghg info</code></td><td>看自己的状态</td></tr>
+                    <tr><td><code>/ghg kind</code></td><td>母体种类菜单（准备阶段）</td></tr>
+                    <tr><td><code>/ghg role</code></td><td>职业选择菜单（准备阶段）</td></tr>
+                    <tr><td><code>/ghg lang &lt;语言&gt;</code></td><td>切换语言</td></tr>
+                    <tr><td><code>/ghg help</code></td><td>帮助</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="collapsible">
+        <div class="collapsible-header" onclick="toggle(this)">
+            <span><i class="fas fa-user-shield" style="color:#fca5a5"></i> 管理命令 · 需要 <code>ghg.admin</code></span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="collapsible-content">
+            <p style="color:#b8c4e0;font-size:.85rem;margin-bottom:.6rem"><code>hunter</code> 可以省掉：<code>/ghga start</code> 与 <code>/ghga hunter start</code> 完全等价。母体模式用 <code>/ghga mode</code> 切换，写入 <code>hunter.queue.mother</code>，下一局生效。</p>
+            <table class="cmd-table">
+                <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                <tbody>
+                    <tr><td><code>/ghga start [玩家...]</code></td><td>开局（AI 母体）</td></tr>
+                    <tr><td><code>/ghga mother &lt;母体&gt; [逃生者...]</code></td><td>用玩家当母体开局</td></tr>
+                    <tr><td><code>/ghga stop</code></td><td>强制结束当前对局</td></tr>
+                    <tr><td><code>/ghga queue</code> / <code>queue start</code> / <code>queue stop</code></td><td>查看 / 立即开局 / 清空队列</td></tr>
+                    <tr><td><code>/ghga mode</code> / <code>mode ai</code> / <code>mode player</code></td><td>切换母体模式（对局中不让切）</td></tr>
+                    <tr><td><code>/ghga test</code></td><td>单人试玩（自己当逃生者）</td></tr>
+                    <tr><td><code>/ghga test mother</code></td><td>单人试玩（自己当母体）</td></tr>
+                    <tr><td><code>/ghga testmother</code></td><td>测试局里切换 AI 母体「追 / 站桩」</td></tr>
+                    <tr><td><code>/ghga charge [百分比]</code></td><td>把所有未完成法阵设到指定进度（默认 10%），不触发瘫痪</td></tr>
+                    <tr><td><code>/ghga down</code> / <code>kit</code></td><td>测试辅助（强制倒地、发一套道具）</td></tr>
+                    <tr><td><code>/ghga pos1</code> / <code>pos2</code> / <code>tool</code></td><td>猎场选区</td></tr>
+                    <tr><td><code>/ghga save</code> / <code>list</code> / <code>load</code> / <code>delete</code> / <code>info</code> / <code>clear</code></td><td>猎场管理</td></tr>
+                    <tr><td><code>/ghga giveitem &lt;道具ID&gt;</code></td><td>发一件道具，如 <code>ritual-knife</code></td></tr>
+                    <tr><td><code>/ghga selftest</code></td><td>运行期自检（单人可跑）</td></tr>
+                    <tr><td><code>/ghga reload</code> / <code>status</code> / <code>lang</code></td><td>维护</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 10. 安装形态 ========== -->
+<section class="section" id="install">
+    <h2 class="section-title"><i class="fas fa-download" style="color:#6ee7b7;margin-right:.5rem"></i>安装与运行形态</h2>
+    <div class="grid-2col">
+        <div class="card card-human">
+            <h3 style="font-size:1rem;margin-bottom:.6rem"><i class="fas fa-check-circle" style="color:#6ee7b7"></i> 安装步骤</h3>
+            <p style="color:#b8c4e0;font-size:.88rem;line-height:1.9">
+                1. 把 <code>GHG_v1.0.0.jar</code> 丢进 <code>plugins/</code><br>
+                2. 需要奖池就装 <strong>Vault</strong> + 一个经济实现（EssentialsX Economy 等）；不装则经济功能自动关闭<br>
+                3. 重启，控制台出现一张启动表<br>
+                4. <code>/ghga tool</code> 拿选区工具 → <code>/ghga pos1</code> <code>/ghga pos2</code> 圈猎场 → <code>/ghga save &lt;名称&gt;</code><br>
+                5. <code>/ghga start</code>（AI 母体）或 <code>/ghga mode player</code> + <code>/ghg join</code>
+            </p>
+            <p style="color:#8b95b0;font-size:.82rem;margin-top:.8rem">支持 <strong>Bukkit / Spigot / Paper / Purpur</strong>，Folia 走调度兼容层。<code>softdepend: [Gost]</code> 只是加载顺序，不是必需依赖。</p>
+        </div>
+        <div class="card card-blue">
+            <h3 style="font-size:1rem;margin-bottom:.6rem"><i class="fas fa-handshake" style="color:#b8d0ff"></i> 与 Gost 并存</h3>
+            <p style="color:#b8c4e0;font-size:.88rem">插件名 <code>GHG</code>、命令 <code>/ghg</code> <code>/ghga</code>、计分板队伍 <code>ghg_*</code> 都与 Gost 不同，同时安装不冲突。同一时刻只跑一种对局：GHG 在跑时开不了经典局，反之亦然。</p>
+        </div>
+    </div>
+
+    <!-- 启动表 -->
+    <div class="card" style="margin-top:1.5rem;background:rgba(0,0,0,.25)!important;border:1px solid rgba(255,255,255,.08)!important;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.9;color:#aab4d0;overflow-x:auto">
+        <div style="color:#6b7490;margin-bottom:.6rem">// 启动时控制台只打印一张 GHG 表（StartupReport）</div>
+        <pre style="margin:0;white-space:pre-wrap">==================================================
+ GHG 1.0.0 · Gost's HunterGame
+ PvE 逃亡：AI 母体猎杀，逃生者破除全部法阵后撤离
+==================================================
+ 命令      /ghg 玩家 · /ghga 管理
+ 服务端    Purpur 26.1.2-2570-e64b1b2 (MC: 26.1.2) [PURPUR]
+ 对局      准备 25s · 上限 900s · 法阵 4 座 · 母体 8 种
+ 配置      v30（ghg-config-version）
+ 语言      zh_CN，1111 条 · 6 种语言
+ 经济      EssentialsX Economy
+ 猎场      tsgGHG
+ 道具      16 件自定义 · 自动投放池 4 种
+ 冲刺矛    已启用（长矛外观）
+ Gost      已安装 v2.4.0
+==================================================
+ 单人试玩：/ghga hunter test  ·  参数：/ghga selftest
+==================================================</pre>
+    </div>
+</section>
+
+<!-- ========== 11. 已知缺口 ========== -->
+<section class="section" id="gaps">
+    <h2 class="section-title"><i class="fas fa-triangle-exclamation" style="color:#fca5a5;margin-right:.5rem"></i>已知缺口</h2>
+    <div class="grid-2col">
+        <div class="card">
+            <h3 style="font-size:1rem;margin-bottom:.6rem"><i class="fas fa-code" style="color:#b8d0ff"></i> 工程遗留</h3>
+            <div class="stat-row"><span class="stat-label">多母体</span><span class="stat-value">配置能写，逻辑只跑一只</span></div>
+            <div class="stat-row"><span class="stat-label">母体寻路</span><span class="stat-value">Pathfinder 追预判点，真实迷宫仍可能绕圈</span></div>
+            <div class="stat-row"><span class="stat-label">痕迹可见性</span><span class="stat-value">粒子全服可见，做不到只给母体</span></div>
+            <div class="stat-row"><span class="stat-label">没有板窗博弈</span><span class="stat-value">追逐只有跑 + 道具 + 职业技能</span></div>
+        </div>
+        <div class="card">
+            <h3 style="font-size:1rem;margin-bottom:.6rem"><i class="fas fa-language" style="color:#fde68a"></i> 其他</h3>
+            <div class="stat-row"><span class="stat-label">道具 lore</span><span class="stat-value">仍硬编码中文（显示名走语言文件）</span></div>
+            <div class="stat-row"><span class="stat-label">平局不进胜率分母</span><span class="stat-value">单独显示平局数</span></div>
+            <div class="stat-row"><span class="stat-label">视觉技能副作用</span><span class="stat-value">GLOWING 全服可见</span></div>
+            <div class="stat-row"><span class="stat-label">队列不管换图</span><span class="stat-value">一局结束队列为空，要再来一局得重新 join</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- 页脚 -->
+<footer class="footer">
+    <p>GHG — Gost's HunterGame · MIT 许可 · 部分代码取自 Gost，玩法灵感来自《黎明杀机》/《第五人格》</p>
+    <p style="margin-top:.4rem">当前版本 <strong>v1.0.0</strong> · 仍在开发中 · 配置版本 <strong>v30</strong> · 中英双语文档</p>
+    <p style="margin-top:.4rem"><a href="https://726113394-cloud.github.io/Gost/" target="_blank">参考上游 Gost Wiki</a> · 发包前 <code>/ghga selftest</code> 自检</p>
+</footer>
+
+</div>
+
+<script>
+function toggle(header){
+    const content = header.nextElementSibling;
+    content.classList.toggle('show');
+    const icon = header.querySelector('i:last-child');
+    if(icon) icon.style.transform = content.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0)';
+}
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+        e.preventDefault();
+        const target=document.querySelector(a.getAttribute('href'));
+        if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+});
+const sections=document.querySelectorAll('.section');
+const observer=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+        if(entry.isIntersecting) entry.target.style.animationPlayState='running';
+    });
+},{threshold:.1});
+sections.forEach(s=>{s.style.animationPlayState='paused';observer.observe(s)});
+</script>
+</body>
+</html>
