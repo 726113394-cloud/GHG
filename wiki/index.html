@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHG v1.0.0 文档 | Gost's HunterGame · PvE 逃亡</title>
+<style>
+  :root{
+    --bg:#08070d; --bg2:#0b0a14;
+    --ink:#eef0ff; --ink-dim:#a6accd; --ink-mute:#767c9d;
+    --line:rgba(255,255,255,.09); --card:rgba(255,255,255,.04);
+    --red:#ff4d6d; --red-soft:rgba(255,77,109,.16);
+    --violet:#8b5cf6; --violet-soft:rgba(139,92,246,.16);
+    --gold:#f5b942; --green:#4ade80;
+    --font:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Consolas,'Cascadia Mono',monospace;
+    --max:1080px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:88px}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--font);
+    line-height:1.75; font-size:15px; overflow-x:hidden; -webkit-font-smoothing:antialiased;
+  }
+  /* ---- 背景光斑：Gost wiki 同款「液态玻璃」，色相换成本作的血红 + 冷紫 ---- */
+  .glow{position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(255,77,109,.22), transparent 45%),
+      radial-gradient(circle at 82% 8%, rgba(139,92,246,.20), transparent 42%),
+      radial-gradient(circle at 50% 92%, rgba(56,32,96,.35), transparent 55%),
+      var(--bg);
+    animation:breathe 16s ease-in-out infinite alternate}
+  @keyframes breathe{from{opacity:.85}to{opacity:1}}
+  .grid-lines{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.22;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(circle at 50% 0%,#000 0%,transparent 72%)}
+
+  /* ---- 顶栏 ---- */
+  header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(8,7,13,.78);border-bottom:1px solid var(--line)}
+  .hwrap{max-width:var(--max);margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:.4px}
+  .logo .mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:14px;
+    background:linear-gradient(140deg,var(--red),var(--violet));box-shadow:0 0 18px rgba(255,77,109,.45)}
+  .ver{font:500 11.5px/1 var(--mono);padding:3px 8px;border-radius:999px;color:var(--red);
+    border:1px solid rgba(255,77,109,.4);background:var(--red-soft)}
+  .hspacer{flex:1}
+  .hlinks{display:flex;gap:16px;font-size:13px}
+  .hlinks a{color:var(--ink-dim);text-decoration:none;border-bottom:1px solid transparent;transition:.18s}
+  .hlinks a:hover{color:#fff;border-bottom-color:var(--red)}
+  @media(max-width:760px){.hlinks{display:none}}
+
+  /* ---- 版心 ---- */
+  main{max-width:var(--max);margin:0 auto;padding:0 22px 90px}
+  section{padding:58px 0;border-bottom:1px solid rgba(255,255,255,.055)}
+  section:last-of-type{border-bottom:none}
+  h2{font-size:clamp(20px,2.4vw,26px);font-weight:800;letter-spacing:.3px;display:flex;align-items:center;gap:10px}
+  h2 .num{font:600 12px/1 var(--mono);color:var(--red);border:1px solid rgba(255,77,109,.35);
+    padding:4px 7px;border-radius:7px;background:var(--red-soft)}
+  h3{font-size:16px;font-weight:700;margin:26px 0 10px;color:#fff}
+  p{color:var(--ink-dim);margin:10px 0}
+  p b,li b,td b{color:#fff;font-weight:700}
+  a{color:var(--violet)}
+  code{font:500 12.5px/1.5 var(--mono);background:rgba(255,255,255,.07);border:1px solid var(--line);
+    padding:1px 6px;border-radius:6px;color:#ffe1e6}
+  .lead{font-size:15.5px}
+
+  /* ---- Hero ---- */
+  .hero{padding:64px 0 26px;border-bottom:none;position:relative}
+  .eyebrow{font:600 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute)}
+  .hero h1{font-size:clamp(28px,4.4vw,46px);font-weight:800;line-height:1.18;letter-spacing:-.5px;margin:14px 0 6px}
+  .hero h1 .grad{background:linear-gradient(100deg,var(--red),#ff9a6b 40%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .sub{font-size:16px;color:var(--ink-dim);max-width:64ch}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 4px}
+  .chip{font-size:12.5px;color:#ffd9e0;background:var(--red-soft);border:1px solid rgba(255,77,109,.28);
+    padding:5px 11px;border-radius:999px}
+  .chip.v{color:#e5dbff;background:var(--violet-soft);border-color:rgba(139,92,246,.3)}
+  .cta{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;font-weight:700;
+    font-size:13.5px;text-decoration:none;transition:.18s;border:1px solid var(--line);color:var(--ink);
+    background:rgba(255,255,255,.05)}
+  .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.22)}
+  .btn.primary{background:linear-gradient(135deg,var(--red),#c2335a);border-color:transparent;
+    box-shadow:0 10px 26px -12px rgba(255,77,109,.8);color:#fff}
+  .btn.ghost{background:transparent}
+
+  /* ---- 卡片 / 表格 ---- */
+  .cards{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:18px}
+  @media(max-width:860px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .card .t{font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .card p{margin:6px 0}
+  .card .k{font:600 11.5px/1 var(--mono);color:var(--ink-mute)}
+  .tw{overflow-x:auto;margin-top:16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
+  th,td{padding:10px 14px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.06)}
+  th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);
+    background:rgba(255,255,255,.04);font-weight:700;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,.03)}
+  td:first-child{color:#fff;font-weight:600;white-space:nowrap}
+
+  /* ---- 可折叠 ---- */
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0;margin-top:14px}
+  details[open]{background:rgba(255,255,255,.055)}
+  summary{cursor:pointer;list-style:none;padding:14px 18px;font-weight:700;display:flex;align-items:center;gap:9px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:'▾';margin-left:auto;color:var(--ink-mute);transition:.2s}
+  details[open] summary::after{transform:rotate(180deg)}
+  .dbody{padding:0 18px 16px;border-top:1px solid rgba(255,255,255,.06)}
+
+  /* ---- 图标徽章宫格（hero 签名元素） ---- */
+  .kinds{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:20px}
+  @media(max-width:760px){.kinds{grid-template-columns:repeat(4,1fr)}}
+  .kind{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:12px;
+    padding:10px 6px;text-align:center;transition:.2s}
+  .kind:hover{border-color:rgba(255,77,109,.5);transform:translateY(-2px)}
+  .kind .e{font-size:19px;display:block}
+  .kind .n{font-size:11.5px;color:var(--ink-dim);margin-top:3px}
+
+  /* ---- 法阵进度模拟器 ---- */
+  .sim{background:linear-gradient(180deg,rgba(255,77,109,.08),rgba(139,92,246,.06));
+    border:1px solid rgba(255,77,109,.24);border-radius:18px;padding:20px;margin-top:18px}
+  .sim .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:12px}
+  .sim label{font-size:13px;color:var(--ink-dim);display:flex;align-items:center;gap:7px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:190px;height:4px;border-radius:99px;
+    background:rgba(255,255,255,.16);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+    background:var(--red);box-shadow:0 0 12px rgba(255,77,109,.8);cursor:pointer}
+  input[type=checkbox]{accent-color:var(--red);width:15px;height:15px;cursor:pointer}
+  .bar{height:14px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;margin:6px 0 2px}
+  .bar>i{display:block;height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--violet),var(--red));transition:width .12s linear}
+  .readout{display:flex;flex-wrap:wrap;gap:18px;font:500 12.5px/1.6 var(--mono);color:var(--ink-dim);margin-top:8px}
+  .readout b{color:#fff}
+  .warn{color:var(--gold)}
+
+  /* ---- 悬浮目录 ---- */
+  .toc{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:40;width:172px;
+    font-size:12.5px;background:rgba(10,9,20,.72);backdrop-filter:blur(12px);
+    border:1px solid var(--line);border-radius:14px;padding:12px 10px}
+  .toc .ttl{font:700 10.5px/1 var(--mono);letter-spacing:.14em;color:var(--ink-mute);
+    text-transform:uppercase;padding:0 6px 8px}
+  .toc a{display:block;padding:5px 8px;border-radius:8px;color:var(--ink-mute);text-decoration:none;
+    border-left:2px solid transparent;transition:.15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .toc a:hover{color:#fff;background:rgba(255,255,255,.05)}
+  .toc a.on{color:#fff;background:rgba(255,77,109,.14);border-left-color:var(--red)}
+  @media(max-width:1320px){.toc{display:none}}
+
+  .top{position:fixed;right:22px;bottom:22px;z-index:45;width:42px;height:42px;border-radius:12px;
+    display:grid;place-items:center;background:rgba(10,9,20,.8);border:1px solid var(--line);
+    color:var(--ink-dim);cursor:pointer;backdrop-filter:blur(10px);transition:.2s}
+  .top:hover{color:#fff;border-color:rgba(255,77,109,.5);transform:translateY(-2px)}
+
+  footer{max-width:var(--max);margin:0 auto;padding:34px 22px 60px;color:var(--ink-mute);font-size:12.5px}
+  footer .fcta{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:20px}
+  footer .fcta b{color:#fff}
+  .tag{display:inline-block;font:500 11px/1 var(--mono);padding:3px 7px;border-radius:6px;
+    background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--ink-dim);margin:2px 4px 2px 0}
+  .ok{color:var(--green)} .no{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="glow"></div><div class="grid-lines"></div>
+
+<header>
+  <div class="hwrap">
+    <div class="logo"><span class="mark">🩸</span>GHG</div>
+    <span class="ver">v1.0.0 · 配置 v18</span>
+    <div class="hspacer"></div>
+    <nav class="hlinks">
+      <a href="#flow">玩法</a><a href="#altar">法阵</a><a href="#mother">母体</a>
+      <a href="#role">职业</a><a href="#items">道具</a><a href="#commands">命令</a><a href="#config">配置</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">Gost's HunterGame · PvE 逃亡</div>
+    <h1>AI 母体在猎场追杀，<br><span class="grad">逃生者推满法阵然后逃出去。</span></h1>
+    <p class="sub lead">一款建立在 <b>Gost</b> 之上的 PvE 逃亡玩法插件：1 母体对最多 4 名逃生者，
+      所有法阵共用一条进度条，推满 100% 后随机一座阵亮起成为撤离点。独立 jar、独立命令
+      <code>/ghg</code> <code>/ghga</code>，可以和 Gost 同时装在服务器上互不干扰。</p>
+    <div class="chips">
+      <span class="chip">🤖 AI 母体 · 7 种</span>
+      <span class="chip">🔮 法阵共享进度</span>
+      <span class="chip">🛠 坚持 Shift 就能玩</span>
+      <span class="chip v">🎭 5 种职业</span>
+      <span class="chip v">🚪 /ghg join 排队开局</span>
+      <span class="chip v">🖱 /ghg 图形菜单</span>
+      <span class="chip v">🌏 六语言</span>
+    </div>
+    <div class="kinds">
+      <div class="kind"><span class="e">👟</span><span class="n">疾行者</span></div>
+      <div class="kind"><span class="e">💥</span><span class="n">冲撞者</span></div>
+      <div class="kind"><span class="e">🏹</span><span class="n">射手</span></div>
+      <div class="kind"><span class="e">🧪</span><span class="n">炼金者</span></div>
+      <div class="kind"><span class="e">🌀</span><span class="n">穿隙者</span></div>
+      <div class="kind"><span class="e">👁</span><span class="n">窥视者</span></div>
+      <div class="kind"><span class="e">🕸</span><span class="n">缚网者</span></div>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#flow">🎯 先看一局怎么打</a>
+      <a class="btn ghost" href="#commands">⌨ 命令速查</a>
+      <a class="btn ghost" href="#config">⚙ 关键配置</a>
+    </div>
+  </section>
+
+  <section id="flow">
+    <h2><span class="num">01</span>一局怎么进行</h2>
+    <p>排队 → 准备 → 猎杀 → 撤离，四个阶段。整局上限 <b>20 分钟</b>，到点判平局（只当兜底，不算谁赢）。</p>
+    <div class="cards">
+      <div class="card">
+        <div class="t">🚪 排队（<code>/ghg join</code>）</div>
+        <p>人凑够 <b>2</b> 人就进 15 秒倒计时，条变绿、到点自动开局；凑人阶段最多等 90 秒，不够就取消。</p>
+        <p class="k">队列不收钱 · 入场费与职业券开局时才收</p>
+      </div>
+      <div class="card">
+        <div class="t">🧭 准备阶段（25 秒）</div>
+        <p>人类可以自由走、敲道具箱抢物资、选职业（菜单自动弹）；<b>母体定身</b>选种类。</p>
+        <p class="k">法阵此刻推不动 · 最后 5 秒锁种类并放倒计时</p>
+      </div>
+      <div class="card">
+        <div class="t">🩸 猎杀阶段</div>
+        <p>按住 <b>Shift</b> 站在法阵上推共享进度。母体进 6 格内开始守机，进度会<b>倒退</b>。</p>
+        <p class="k">默认单人 0.9%/秒 · 被守时 −0.6%/秒</p>
+      </div>
+      <div class="card">
+        <div class="t">🚪 撤离阶段</div>
+        <p>进度满 100% 后<b>随机一座刚破的法阵</b>变成撤离点（不会是最后破的那座），按住 Shift 4 秒走人。</p>
+        <p class="k">只要一人成功撤离，整局收尾 · 只剩 1 人时会开地窖</p>
+      </div>
+    </div>
+    <details>
+      <summary>🕹 交互全用 Shift —— 基岩版也能玩</summary>
+      <div class="dbody">
+        <p>Java 版和基岩版的差异卡在左右键上，所以关键动作一律做成潜行键：</p>
+        <div class="tw"><table>
+          <thead><tr><th>动作</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>破法阵</td><td>站在法阵格上 <b>按住 Shift</b></td></tr>
+            <tr><td>救援 / 拆阵救人 / 治疗</td><td>蹲在旁边 <b>按住 Shift</b>（救援 3 秒 · 治疗 8 秒）</td></tr>
+            <tr><td>自愈（受伤）</td><td>自己蹲下 <b>按住 Shift</b> 20 秒，且饱食度 ≥ 8</td></tr>
+            <tr><td>撤离</td><td>站在撤离点 <b>按住 Shift</b> 4 秒</td></tr>
+            <tr><td>母体抱起倒地者</td><td>贴到 2.5 格内 <b>按住 Shift</b> 2 秒（AI 自动抱）</td></tr>
+            <tr><td>从母体手里挣脱</td><td>被抱着时 <b>按住 Shift</b> 攒满 8 秒</td></tr>
+            <tr><td>母体砍击 / 放技能</td><td><b>左键</b>（战斧） / <b>右键</b>（技能道具）</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </details>
+  </section>
+
+  <section id="altar">
+    <h2><span class="num">02</span>法阵：所有阵共用一条进度</h2>
+    <p>法阵不会一座一座破。<b>所有法阵共用一条进度条</b>，站任意一座完好的阵上都在给同一条加；
+      推满 100% 时全场法阵一起破除。这样「守哪座阵」不再是算术题，两边都在推进同一条线。</p>
+    <div class="sim" id="sim">
+      <div class="row">
+        <label>基准涨速 <input type="range" id="simBase" min="0.4" max="3" step="0.1" value="1"></label>
+        <label><input type="checkbox" id="simEng"> 工程师在推（×1.25）</label>
+        <label><input type="checkbox" id="simGuard"> 母体守机（−1.5%/秒）</label>
+      </div>
+      <div class="bar"><i id="simBar"></i></div>
+      <div class="readout">
+        <span>实际涨速 <b id="simRate">—</b></span>
+        <span>净速率 <b id="simNet">—</b></span>
+        <span>推满需要 <b id="simEta">—</b></span>
+        <span>当前进度 <b id="simPct">0%</b></span>
+      </div>
+      <div class="row" style="margin-top:14px;margin-bottom:0">
+        <button class="btn" id="simRun">▶ 模拟 30 秒</button>
+        <button class="btn ghost" id="simReset">↺ 重置</button>
+        <span class="readout" id="simHint" style="margin:0"></span>
+      </div>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>相关数值</th><th>默认值</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>法阵数量</td><td><b>4</b> 座</td><td><code>altar.count</code> 可填 1–8；0 = 随人数</td></tr>
+        <tr><td>涨速封顶</td><td><b>0.9%/秒</b></td><td>= 基准 1.0 × 0.9，再乘蓄力者里最高的职业权重（工程师 1.25 → 1.125%/秒）</td></tr>
+        <tr><td>多人叠加</td><td class="no"><b>不叠加</b></td><td>只取最强的那个，所以人多不会更快</td></tr>
+        <tr><td>守机压制</td><td><b>−1.5%/秒</b></td><td>母体进 6 格内，净 −0.6%/秒，进度会倒退到 0 为止</td></tr>
+        <tr><td>加固</td><td><b>50 秒</b></td><td>玩家母体砸法阵格上的红石块 → 变哭泣的黑曜石，期间人类推不动</td></tr>
+        <tr><td>坐标通报</td><td><b>每 60 秒</b></td><td>把未完成法阵的坐标发给所有逃生者，并在阵上打光柱</td></tr>
+        <tr><td>破阵刀</td><td><b>+10%</b></td><td>站在法阵上右键，直接推进共享进度</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="mother">
+    <h2><span class="num">03</span>母体：7 种种类，一人一个技能</h2>
+    <p>AI 母体与玩家母体<b>共用同一套实现</b>，调试时能真人验证手感。AI 每局从 <code>enabled-kinds</code> 里随机抽一个。</p>
+    <div class="tw"><table>
+      <thead><tr><th>种类</th><th>技能效果</th><th>冷却</th><th>门票</th></tr></thead>
+      <tbody>
+        <tr><td>👟 疾行者</td><td>速度Ⅰ 6 秒</td><td>20 秒</td><td>免费</td></tr>
+        <tr><td>💥 冲撞者</td><td>朝<b>自己瞄准的方向</b>猛冲 8~9 格；1.6 秒窗口内撞到人 → 眩晕 2 秒（AI 则朝最近逃生者冲）</td><td>16 秒</td><td>100</td></tr>
+        <tr><td>🏹 射手</td><td>骨矢命中 = <b>一次正常受伤</b>（两下倒地），<b>不给减速</b></td><td>16 秒</td><td>120</td></tr>
+        <tr><td>🧪 炼金者</td><td>弩箭命中处炸喷溅药水，半径 3 格缓慢Ⅰ 3 秒</td><td>18 秒</td><td>100</td></tr>
+        <tr><td>🌀 穿隙者</td><td>传送到目标身后 1.8 格，自己硬直 2 秒</td><td>28 秒</td><td>150</td></tr>
+        <tr><td>👁 窥视者</td><td>隐身 + 速度Ⅱ 7 秒，打中人后加速立刻消失</td><td>28 秒</td><td>180</td></tr>
+        <tr><td>🕸 缚网者</td><td>以自身为中心甩减速网，半径 7 格缓慢Ⅰ 3 秒</td><td>18 秒</td><td>120</td></tr>
+      </tbody>
+    </table></div>
+    <details open>
+      <summary>🐺 所有母体共用的「手感」——墙后真的能躲了</summary>
+      <div class="dbody">
+        <div class="tw"><table>
+          <thead><tr><th>机制</th><th>行为</th></tr></thead>
+          <tbody>
+            <tr><td>基础移速</td><td><b>0.26</b>（原版僵尸 0.23 / 骷髅 0.25 / 蜘蛛 0.30）</td></tr>
+            <tr><td>攻击</td><td>2.2 格 / 4 秒一次；砍中后自己原地缓慢Ⅳ 2 秒，斧头消失 4 秒后回收</td></tr>
+            <tr><td>卡视野</td><td>目标被方块挡住就<b>找不到</b>；例外：6 格内必看得见、<b>正在破阵的人靠声音仍能被感知</b>（20 格）；斧子也要视线</td></tr>
+            <tr><td>够不着就不追</td><td>目标比你高 3 格以上（屋顶 / 断崖）时不追，避免在墙根反复跳</td></tr>
+            <tr><td>绕后</td><td>目标背对你、距离 4~12 格时绕到<b>侧后方</b>再压上；同一目标只绕一次，冷却 8 秒</td></tr>
+            <tr><td>假动作</td><td>目标正盯着你时，35% 概率先横向窜一下再压上</td></tr>
+            <tr><td>守机判断</td><td>优先守<b>有人正在推</b>的阵 → 否则最近的、没加固也没被封印的阵；站位偏到阵心外 3 格</td></tr>
+            <tr><td>AI 专属</td><td>跳跃提升Ⅲ（≈3 格）；卡住 6 秒自动传送到逃生者附近；撞栅栏 3 下拆掉</td></tr>
+          </tbody>
+        </table></div>
+        <p><b>移动只能有一个控制者</b>：平时用原版 AI 追人，只在「绕后 / 假动作 / 搜索 / 巡逻」这四段切到 Paper 的
+          Pathfinder，切之前先停掉原版 —— 两套控制器同时开会互相抢、走起来直抽搐。</p>
+      </div>
+    </details>
+  </section>
+
+  <section id="role">
+    <h2><span class="num">04</span>逃生者职业</h2>
+    <p>每局随机一个，准备阶段自动弹菜单（也能 <code>/ghg role</code>），换职业按差价补退职业券。
+      技能道具不可叠加，<b>用掉之后才开始计时补发</b>，而且不会从道具箱里开出来。</p>
+    <div class="tw"><table>
+      <thead><tr><th>职业</th><th>主动</th><th>被动</th><th>冷却</th><th>券</th></tr></thead>
+      <tbody>
+        <tr><td>🧊 冰球手</td><td>凝冰球砸中母体 → 眩晕 4 秒并松手（<b>AI 母体局不分配</b>）</td><td>—</td><td>55 秒</td><td>80</td></tr>
+        <tr><td>🛡 守护者</td><td>救赎护符：15 秒内救人读条 ×3（仍要贴身按住 Shift）</td><td>救援 / 治疗读条 ×1.3</td><td>45 秒</td><td>60</td></tr>
+        <tr><td>⚡ 突击手</td><td>冲刺矛：短距突进约 4~5 格</td><td>心跳听距 ×1.5</td><td>40 秒</td><td>60</td></tr>
+        <tr><td>🔨 工程师</td><td>栅栏工具：右键架 3×2 木栅栏，要打 3 下才塌</td><td>破阵蓄力上限 ×1.25（1.125%/秒）</td><td>45 秒</td><td>40</td></tr>
+        <tr><td>🏃 跑者</td><td>肾上腺素：速度Ⅰ 4 秒，之后 2 秒缓慢</td><td>—</td><td>35 秒</td><td>40</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="items">
+    <h2><span class="num">05</span>道具：只从道具箱出</h2>
+    <p>箱子是<b>西瓜</b>，敲 5 下破，给 2 件：<b>第一件固定应急口粮</b> + 1 件随机。开局 3 个，每 40 秒补 2 个，上限 10。</p>
+    <div class="cards">
+      <div class="card">
+        <div class="t">🍞 应急口粮（保底）</div>
+        <p>按住右键<b>真进食</b>，一份一口，回 6 点饱食度 + 4 饱和度。对局里饱食度是真的会掉光的。</p>
+      </div>
+      <div class="card">
+        <div class="t">💉 医疗包</div>
+        <p>右键<b>立刻治好受伤</b>。</p>
+      </div>
+      <div class="card">
+        <div class="t">🔪 破阵刀</div>
+        <p>站在法阵上右键，共享进度 <b>+10%</b>。</p>
+      </div>
+      <div class="card">
+        <div class="t">⏰ 控魂术</div>
+        <p><b>定身母体 4 秒</b>，CD 25 秒。</p>
+      </div>
+      <div class="card">
+        <div class="t">🥩 臭牛排</div>
+        <p><b>按住右键真吃</b>（有进食动作，松手会打断），吃完给速度Ⅰ 6 秒 + <b>自己发光 5 秒</b>，不补饱食度。</p>
+      </div>
+      <div class="card">
+        <div class="t">🟣 传送珍珠 / 漂浮药水</div>
+        <p>投掷传送（CD 10 秒） / 漂浮 4.5 秒 —— 都是位移手段。</p>
+      </div>
+      <div class="card">
+        <div class="t">👻 母体开箱拿专属</div>
+        <p>狂暴药水（速度Ⅱ 10 秒）或灵魂探测器（25 秒全场发光）。这两件<b>不允许丢弃</b>。</p>
+      </div>
+      <div class="card">
+        <div class="t">🧰 职业道具不进箱子</div>
+        <p>免得和职业补发叠成两件，破坏「不可叠加」。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="numbers">
+    <h2><span class="num">06</span>关键数值速查</h2>
+    <div class="tw"><table>
+      <thead><tr><th>事件</th><th>数值</th></tr></thead>
+      <tbody>
+        <tr><td>击倒条件</td><td>被打中 <b>2 次</b>（第 1 次是「受伤」）</td></tr>
+        <tr><td>命中链</td><td>命中瞬间<b>不减速</b>：先给速度Ⅱ 2 秒，结束接缓慢Ⅰ 1.5 秒</td></tr>
+        <tr><td>倒地自愈</td><td><b>15 秒</b>没人处理 → 自己爬回「受伤」</td></tr>
+        <tr><td>救援 / 治疗</td><td>救援读条 <b>3 秒</b>（半径 2.5）；队友治疗 8 秒 / 自愈 20 秒</td></tr>
+        <tr><td>救人保护</td><td>被救下后 <b>3 秒</b>内砍不动；每人每局最多被救 1 次</td></tr>
+        <tr><td>狂欢之椅</td><td>钉在法阵上：<b>60 → 30 → 5 秒</b>放飞；拆阵救人 4 秒；挣扎 8 秒；AI 守尸 10 秒</td></tr>
+        <tr><td>心跳</td><td>48 格内 1.5 秒一次 → 贴身 0.23 秒一次，音量 0.9→1.8</td></tr>
+        <tr><td>饱食度</td><td>常驻饥饿Ⅱ，进场饱和度只给 5；食物 ≤ 6 追加缓慢Ⅰ</td></tr>
+        <tr><td>跳跃疲劳</td><td>5 秒内跳超过 3 次 → 缓慢Ⅰ 2 秒 + 禁止起跳 2 秒</td></tr>
+        <tr><td>对局上限</td><td><b>1200 秒</b>（20 分钟），到点判平局</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="economy">
+    <h2><span class="num">07</span>钱怎么分</h2>
+    <p><b>奖金只看每个人做了什么，不看哪一方赢。</b>入场费 50 + 服务器保底 500 组成奖池，按行动分分给所有真人玩家。</p>
+    <div class="tw"><table>
+      <thead><tr><th>谁</th><th>行动</th><th>默认分</th></tr></thead>
+      <tbody>
+        <tr><td>逃生者</td><td>每秒破阵</td><td>2.0 / 秒</td></tr>
+        <tr><td>逃生者</td><td>成功救人</td><td>15.0</td></tr>
+        <tr><td>逃生者</td><td>成功撤离（额外）</td><td>25.0</td></tr>
+        <tr><td>母体</td><td>命中 / 击倒 / 淘汰</td><td>5.0 / 10.0 / 40.0</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>两池制</b>：逃生者交的入场费只在逃生者之间分；<b>母体只分服务器保底，封顶 50%</b>。
+      对局中断全额退还；时间到判平局，奖金照发。</p>
+  </section>
+
+  <section id="commands">
+    <h2><span class="num">08</span>命令与权限</h2>
+    <p>不想记命令就敲 <code>/ghg</code>：<b>不带参数直接开图形菜单</b>（我的状态 / 对战 / 职业图鉴 /
+      母体种类图鉴 / 游戏流程 / 语言 / 命令一览，管理员还能看到「配置调试」板块）。</p>
+    <div class="cards">
+      <div class="card">
+        <div class="t">👤 玩家</div>
+        <p><code>/ghg</code> 图形菜单 · <code>/ghg join</code> 排队 · <code>/ghg leave</code> 退出</p>
+        <p><code>/ghg info</code> 状态 · <code>/ghg role</code> 职业菜单 · <code>/ghg lang</code> 语言</p>
+      </div>
+      <div class="card">
+        <div class="t">🛡 管理员（<code>ghg.admin</code>）</div>
+        <p><code>/ghga start</code> 开局 · <code>/ghga stop</code> 收局 · <code>/ghga kind</code> 选种类</p>
+        <p><code>/ghga queue [start|stop]</code> 队列 · <code>/ghga stats</code> 战绩 · <code>/ghga test</code> 单人试玩</p>
+        <p class="k">hunter 可以省掉，/ghga hunter start 也一样</p>
+      </div>
+    </div>
+    <details>
+      <summary>🗺 猎场圈地（第一次装必看）</summary>
+      <div class="dbody">
+        <p><code>/ghga tool</code> 拿小麦选择工具 → 左键点一个角、右键点对角 → <code>/ghga save 猎场1</code>
+          → <code>/ghga load 猎场1 enable</code>（新建的猎场默认<b>未启用</b>，不启用抽不到图）。</p>
+        <p>法阵 / 逃脱点 / 道具箱位置全自动算：包围盒切 3×3 九宫格随机抽，局内固定、局间不重复。
+          <code>area.random-each-game</code> 开着时每局从所有已启用猎场里随机挑一张。</p>
+      </div>
+    </details>
+  </section>
+
+  <section id="config">
+    <h2><span class="num">09</span>关键配置（<code>plugins/GHG/config.yml</code>）</h2>
+    <p>配置文件只含 GHG 真正读取的段：<code>hunter</code> / <code>area</code> / <code>items</code> /
+      <code>inventory</code> / <code>language</code> / <code>update-check</code>。
+      当前<b>配置版本 18</b>，版本不匹配会自动备份成 <code>config_old_v&lt;旧版本&gt;.yml</code> 再迁移。</p>
+    <div class="tw"><table>
+      <thead><tr><th>键</th><th>默认</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>hunter.duration</code></td><td>1200</td><td>对局上限（秒）</td></tr>
+        <tr><td><code>hunter.preparation-seconds</code></td><td>25</td><td>准备阶段</td></tr>
+        <tr><td><code>hunter.altar.count</code></td><td>4</td><td>法阵数量（1–8）</td></tr>
+        <tr><td><code>hunter.altar.progress-per-second</code></td><td>1.0</td><td>基准涨速，实际封顶 ×0.9</td></tr>
+        <tr><td><code>hunter.altar.decay-per-second</code></td><td>1.5</td><td>守机回落，&gt; 涨速才能推负</td></tr>
+        <tr><td><code>hunter.mother.speed</code></td><td>0.26</td><td>母体移速（绝对值）</td></tr>
+        <tr><td><code>hunter.mother.line-of-sight</code></td><td>true</td><td>卡视野：墙后看不见就不追</td></tr>
+        <tr><td><code>hunter.mother.flank.enabled</code></td><td>true</td><td>绕后</td></tr>
+        <tr><td><code>hunter.queue.min-players</code></td><td>2</td><td>凑够几人开局</td></tr>
+        <tr><td><code>hunter.reward.server-bonus</code></td><td>500</td><td>服务器保底奖金</td></tr>
+        <tr><td><code>area.random-each-game</code></td><td>true</td><td>每局随机抽猎场</td></tr>
+      </tbody>
+    </table></div>
+    <p class="k">改完保存，<code>/ghga reload</code> 热重载配置与猎场数据；菜单里的「管理员调试」板块也能直接改数值。</p>
+  </section>
+
+  <section id="compat">
+    <h2><span class="num">10</span>安装与运行形态</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="t">📦 能单独跑</div>
+        <p>只装 <code>GHG_v1.0.0.jar</code>（Vault 可选）就完整可用；和 <b>Gost 本体</b> 同时装也互不干扰。</p>
+        <p class="k">plugin.yml 里 Gost 只在 softdepend</p>
+      </div>
+      <div class="card">
+        <div class="t">🧩 兼容</div>
+        <p><span class="tag ok">Bukkit</span><span class="tag ok">Spigot</span><span class="tag ok">Paper</span>
+          <span class="tag ok">Purpur</span><span class="tag ok">Folia</span></p>
+        <p>调度全部走兼容层（含实体调度器）；ActionBar 探测 Adventure → Bungee → 聊天；音效 / 粒子 / 属性都有别名回退。</p>
+      </div>
+    </div>
+    <details>
+      <summary>🩺 出问题先跑这两个</summary>
+      <div class="dbody">
+        <p><code>/ghga selftest</code>：单人不用开局就能查平台探测、语言加载、配置版本、经济、区域、道具工厂、
+          ActionBar 通道、调度器，以及<b>有没有未归还的背包快照</b>。</p>
+        <p><code>/ghga hunter stats</code>：看胜率与平均时长。长期偏向母体 = 逃生者缺「换时间」的手段；
+          法阵 charged/total 长期停在 0 = 根本没人摸到法阵。</p>
+      </div>
+    </details>
+  </section>
+
+  <section id="faq">
+    <h2><span class="num">11</span>已知缺口（不糊弄）</h2>
+    <div class="tw"><table>
+      <thead><tr><th>项</th><th>现状</th></tr></thead>
+      <tbody>
+        <tr><td>双 AI 母体</td><td>配置项 <code>ai-count</code> 能填，但生成与行为仍是单母体</td></tr>
+        <tr><td>痕迹可见性</td><td>抓痕 / 血迹 / 发光都是粒子，<b>全服可见</b>，做不到只给母体看</td></tr>
+        <tr><td>道具 lore</td><td>显示名已多语言，lore 仍硬编码中文</td></tr>
+        <tr><td>平局</td><td>单独计数，不进胜率分母</td></tr>
+        <tr><td>母体寻路</td><td>Pathfinder 三层兜底 + 脱困传送，真实迷宫仍可能绕圈</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</main>
+
+<nav class="toc" id="toc">
+  <div class="ttl">目录</div>
+  <a href="#flow">01 一局怎么进行</a>
+  <a href="#altar">02 法阵进度</a>
+  <a href="#mother">03 母体种类</a>
+  <a href="#role">04 逃生者职业</a>
+  <a href="#items">05 道具</a>
+  <a href="#numbers">06 数值速查</a>
+  <a href="#economy">07 钱怎么分</a>
+  <a href="#commands">08 命令与权限</a>
+  <a href="#config">09 关键配置</a>
+  <a href="#compat">10 安装与形态</a>
+  <a href="#faq">11 已知缺口</a>
+</nav>
+
+<div class="top" id="toTop" title="回到顶部">↑</div>
+
+<footer>
+  <div class="fcta">
+    <b>🎉 开一局试试</b><br>
+    <code>/ghg join</code> 排队开局 · <code>/ghga test</code> 单人试玩 · <code>/ghga selftest</code> 体检<br>
+    <span style="color:var(--ink-mute)">玩法：AI 母体猎杀，推满法阵然后逃出去。命令全在 <code>/ghg</code> 的图形菜单里，不用背。</span>
+  </div>
+  <p>GHG（Gost's HunterGame）· 基于 Gost 的道具与基础设施做的 PvE 逃亡玩法 ·
+    继承上游 MIT 许可 · 本文档对应 v1.0.0 / 配置 v18</p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- 悬浮目录：滚动高亮 ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function spy() {
+    var y = window.scrollY + 140, idx = 0;
+    sections.forEach(function (s, i) { if (s && s.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('on', i === idx); });
+  }
+  window.addEventListener('scroll', spy, { passive: true });
+  spy();
+
+  var topBtn = document.getElementById('toTop');
+  topBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  /* ---------- 法阵进度模拟器 ----------
+     规则和插件里一致：涨速 = 基准 × 0.9 ×（工程师 1.25），封顶只乘一次；
+     守机时减去 1.5%/秒，所以可能变成负数（进度倒退，最低 0）。 */
+  var base = document.getElementById('simBase');
+  var eng = document.getElementById('simEng');
+  var guard = document.getElementById('simGuard');
+  var bar = document.getElementById('simBar');
+  var outRate = document.getElementById('simRate');
+  var outNet = document.getElementById('simNet');
+  var outEta = document.getElementById('simEta');
+  var outPct = document.getElementById('simPct');
+  var hint = document.getElementById('simHint');
+  var runBtn = document.getElementById('simRun');
+  var resetBtn = document.getElementById('simReset');
+
+  var progress = 0, timer = null;
+
+  function rate() {
+    var r = parseFloat(base.value) * 0.9 * (eng.checked ? 1.25 : 1);
+    return r;
+  }
+  function net() {
+    return rate() - (guard.checked ? 1.5 : 0);
+  }
+  function fmt(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+
+  function refresh() {
+    var r = rate(), n = net();
+    outRate.textContent = fmt(r) + '%/秒';
+    outNet.textContent = fmt(n) + '%/秒';
+    outNet.style.color = n < 0 ? 'var(--red)' : (n === 0 ? 'var(--gold)' : 'var(--green)');
+    outEta.textContent = n > 0 ? Math.ceil(100 / n) + ' 秒' : '永远推不满';
+    outPct.textContent = Math.round(progress) + '%';
+    bar.style.width = Math.max(0, Math.min(100, progress)) + '%';
+    hint.textContent = n < 0
+      ? '⚠ 被守机时净速率是负的：进度会倒退（最低到 0）'
+      : (eng.checked ? '工程师权重 1.25 已生效（只乘一次，人多不再叠加）' : '');
+    hint.className = 'readout' + (n < 0 ? ' warn' : '');
+  }
+
+  function stop() { if (timer) { clearInterval(timer); timer = null; } runBtn.textContent = '▶ 模拟 30 秒'; }
+
+  runBtn.addEventListener('click', function () {
+    if (timer) { stop(); return; }
+    runBtn.textContent = '⏸ 暂停';
+    var ticks = 0;
+    timer = setInterval(function () {
+      progress = Math.max(0, Math.min(100, progress + net() * 0.1));  /* 0.1 秒一步 */
+      ticks++;
+      refresh();
+      if (ticks >= 300) { stop(); }                                  /* 30 秒 */
+    }, 100);
+  });
+  resetBtn.addEventListener('click', function () { stop(); progress = 0; refresh(); });
+  base.addEventListener('input', refresh);
+  eng.addEventListener('change', refresh);
+  guard.addEventListener('change', refresh);
+  refresh();
+})();
+</script>
+</body>
+</html>

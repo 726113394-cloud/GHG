@@ -1,0 +1,34 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 早期手工构建残留（源码真正的家在 main/ 与 resources/）
+.build/
+sources_rel.txt
+META-INF/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# 系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 注：根目录的 GHG_v*.jar 与 GHG_v*_code.zip 是对外发布产物，
+# 按本项目的发版约定需要提交，因此不在此忽略。
+
+# 上游 Gost 的发布材料（README/CHANGELOG/旧 jar/官网 HTML），只作对照参考
+_upstream/
+
+# 本次开发过程生成的临时补丁脚本（tools/_xxx.py），不属于项目资产
+tools/_*.py
+
+# 构建日志
+*.log

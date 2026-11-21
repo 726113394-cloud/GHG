@@ -1,0 +1,431 @@
+# ============================================================
+# GHG 生成的配置：只含本插件真正读取的段
+#   hunter:   玩法主配置（时长 / 法阵 / 母体 / 受击 / 椅子 / 职业 / 奖励 / 道具箱 / 测试）
+#   area:     猎场圈地（选区工具、数量上限、猎场保护）
+#   items:    道具数值（凝冰球 / 牛排 / 传送珍珠 / 护符 / 冲刺矛 …）
+#   inventory 道具叠加规则 · language 语言 · update-check 更新检查
+# ------------------------------------------------------------
+# 旧版 Gost 段（经典局感染、猎魔人、鬼粒子等）不再生成，
+# 需要对照的话看同目录的 config-gost-legacy.yml —— 插件不会读它。
+# `ghg-config-version` 由插件自己维护，别手改。
+# ============================================================
+
+# ============================================================
+# GHG 配置文件
+# ------------------------------------------------------------
+# GHG 管理员只需要改下面这几段（其它都是 Gost 时代的遗留配置，
+# 本插件不读取；保留只是为了兼容旧服务端，随时可以整段删掉）：
+#
+#   game / economy            —— 经典局遗留，GHG 不看
+#   hunter:                   —— **主配置**：时长、准备、法阵、母体、受击链、椅子、道具
+#     hunter: altar           —— 法阵数量（1-8）与进度速度
+#     hunter: mother          —— 母体种类、速度、斧子冷却、后摇、AI 数量
+#     hunter: downed / chair  —— 倒地自愈、救人保护、狂欢之椅、挣扎
+#     hunter: role            —— 逃生者职业、道具补发冷却、栅栏
+#     hunter: reward          —— 入场费、保底、行动分、职业券
+#     hunter: items           —— 应急口粮、破阵刀、肾上腺素、凝冰球
+#     hunter: chest           —— 道具箱数量、补货间隔、开箱件数
+#     hunter: test            —— 单人测试局
+#   area:                     —— 猎场圈地：选区工具、数量上限、猎场保护
+#
+# 音效/粒子/语言相关的开关都在 hunter: 段内各自的小节里。
+# ============================================================
+
+# GHG（Gost's HunterGame）配置文件
+# 版本: 1.0.0
+# Minecraft: 1.20.x
+
+ghg-config-version: 1
+
+# 启动时向 Modrinth 查询一次是否有新版本，有新版本会提示在线管理员
+update-check:
+  enabled: true
+
+# 服务端支持: Bukkit/Spigot/Paper/Purpur 完整 | Folia 调度兼容 | Sponge/代理端 不适用
+
+# ==================== 游戏设置 ====================
+items:
+  adrenaline:                 # 肾上腺素（喷溅夜视药水 / 人类）
+    duration: 6               # 速度Ⅰ持续（秒）——GHG 里下调过，原来 10 秒速度Ⅱ对母体太狠
+    speed-level: 1            # 速度等级（1=速度Ⅰ）
+  frenzy:                     # 狂暴药水（喷溅治疗药水 / 鬼）
+    duration: 10
+    speed-level: 2
+  ice-ball:                   # 凝冰球（雪球 / 通用）：命中逃生者减速，命中母体则眩晕并让她松手
+    slow-duration: 3          # 减速持续（秒）——GHG 里从 4 秒缓慢Ⅳ 下调
+    slow-level: 2             # 减速等级（2=缓慢Ⅱ）
+  soul-control:               # 控魂术（时钟 / 人类）
+    freeze-duration: 4        # GHG：定身母体的秒数（经典局仍是「全场鬼无法移动」）
+    cooldown: 25
+  teleport-pearl:             # 传送珍珠（末影珍珠 / 通用）
+    cooldown: 10 # 冷却（秒）——太长会让人以为道具坏了
+  stinky-steak:               # 臭牛排（通用）
+    speed-duration: 6         # 速度Ⅰ持续（秒）——GHG 里大幅下调
+    speed-level: 1            # 1=速度Ⅰ
+    glowing-duration: 5       # 发光标记（秒）：发光本身就是代价，别太长
+    restore-food: 3           # 吃下去补多少点饱食度（"不多但有"；面包一口是 6 点）
+    restore-saturation: 1.0   # 顺带补多少饱和度
+    cooldown: 45              # 旧键：臭牛排现在不做右键触发、也没有冷却（靠原版进食与饱食度限速），已不再读取
+    eat-time-ticks: 40        # 旧键：进食时长由原版决定（约 1.6 秒），已不再读取
+  soul-detector:              # 灵魂探测器（指南针 / 母体）
+    duration: 25              # 揭示所有玩家位置（秒）
+    cooldown: 35
+  redemption-charm:           # 救赎护符（紫水晶碎片）：不是远程救人，是把救人读条加快
+    duration-seconds: 15      # 生效时长
+    speed-multiplier: 3.0     # 救人读条加速倍率
+    cooldown: 45              # 冷却（秒）
+  levitation:                 # 漂浮药水（滞留药水 / 通用）
+    duration-ticks: 120       # 6 秒
+    amplifier: 1              # 漂浮等级（0 = 漂浮Ⅰ，1 = 漂浮Ⅱ，越高升得越快）
+    cooldown: 0               # 冷却（秒）；0 = 无冷却（这道具靠瓶数限速）
+    chest-weight: 3           # 在道具箱随机池里的权重（1 = 和别的道具等权；0 = 不进池）
+  stun-potion:                # 眩晕药水（喷溅药水 / 人类）：砸中母体立刻定身
+    stun-ticks: 30            # 定身时长（刻，30 = 1.5 秒）：期间不能移动、不能互动
+    radius: 3.0               # 喷溅生效半径
+  spear-rush:                 # 冲刺矛（三叉戟/矛 / 通用）
+    velocity: 1.6 # 冲刺初速度（格/刻）：1.6 约 7~8 格（原来 1.1 只有 4~5 格，太短）
+    distance: 5.5 # 旧键（曾被当成速度用，已不再读取）
+    consume-on-use: true
+inventory:
+  max-item-types: 9
+  max-items: 9
+  allow-duplicate-universal: true
+  force-first-slot-items: "收割者,神之救赎"
+
+# ==================== 效果设置 ====================
+area:
+  tool-material: WHEAT # 圈地选区工具的材质（默认小麦）。填任何 Material 名都可以
+  selection-tool: MAGMA_CREAM # 旧键（Gost 时代的键名），已不再读取，留着不碍事
+  protection: true # 猎场保护：没管理权限的人（不在对局中）不能挖/放猎场里的方块
+  max-areas: 20
+  auto-teleport: true
+  ignore-y-axis: false
+  # 每局从「已启用」的区域中随机选一张图。
+  # 管理员用 /ghga load <名称> 手动指定的区域只对下一局生效（之后恢复随机）。
+  # 设为 false 则沿用当前选中区域，不再每局随机。
+  random-each-game: true
+
+# ==================== 道具刷新 ====================
+language:
+  # 可选: zh_CN / en_US / ja_JP / es_ES / fr_FR / de_DE
+  # 语言文件: plugins/Gost/lang/<locale>.yml 可自行修改，/gost reload 生效
+  default: zh_CN
+  auto-detect: true
+  max-item-types-per-player: 6
+
+# ==================== 音效 / 字幕 / 广播 / 粒子 ====================
+hunter:
+  duration: 900 # 对局时长上限（秒）= 15 分钟，到点没撤离算失败
+  preparation-seconds: 30 # 准备阶段：人类可自由移动、法阵不可破、母体定身、选母体种类/职业
+  no-sprint: true # 对局中所有玩家（含玩家母体）禁止疾跑
+  kind-lock-seconds: 5 # 准备阶段最后几秒锁定母体种类（同时给全场放居中倒计时）
+  jump-fatigue:
+    enabled: true # 跳跃疲劳：不禁止跳跃，超出配额给一段缓慢（腿软）
+    max-jumps: 3 # window-seconds 内允许的连续跳跃次数（人类）
+    mother-max-jumps: 4 # 玩家母体的宽容次数：默认比人类多一次
+    mother-penalty-seconds: 1 # 玩家母体的腿软时长：默认比人类少一秒
+    window-seconds: 5 # 配额统计窗口
+    penalty-seconds: 2 # 超出配额后的腿软时长
+    penalty-level: 1 # 超出配额后的腿软等级
+  darkness:
+    enabled: true # 逃生者压黑暗效果，母体不受影响
+    preparation: true # 准备阶段也压黑暗（false = 准备阶段视野正常，方便踩点）
+    amplifier: 0 # 黑暗等级（0 = I 级）
+  perk: # 逃生者构筑：开局每人随机一个被动，给点分工
+    enabled: true
+  spectate: # 观战席位（对局已开始时没排上队的人可以进来看）
+    enabled: true # 关掉后只能提示「对局已开始」，不能观战
+    margin: 10 # 观战者 / 已被淘汰的人最多离开猎场 X/Z 边界多少格（防止借旁观出图看位置）
+  reward: # 奖池（需要 Vault；没有 Vault 时整块自动失效）
+    enabled: true
+    early-exit-settle: true # 被淘汰的人提前 /ghg leave 时，按当前贡献分立即结算一份
+    entry-fee: 50 # 每个逃生者入场费，进奖池
+    server-bonus: 500 # 服务器保底奖金（调低避免刷币，靠表现分拿钱）
+    survivor-split: 1.0 # 逃生者撤离时，奖池给逃生者的比例
+    mother-split: 1.0 # 玩家母体获胜时，奖池给母体的比例
+    actions: # 行动分：奖金按「谁做了什么」分，跟哪一方赢无关
+      altar-second: 2.0 # 逃生者每秒破阵
+      rescue: 15.0 # 每次成功救人
+      escape: 25.0 # 成功撤离的额外分
+      mother-hit: 5.0 # 母体每次命中
+      mother-down: 10.0 # 母体每次击倒
+      mother-eliminate: 40.0 # 母体每淘汰一人
+    role-fee: # 职业入场券
+      ICER: 80.0
+      GUARDIAN: 60.0
+      LANCER: 60.0
+      ENGINEER: 40.0
+      RUNNER: 40.0
+      WRAITH: 50.0
+    contribution: # 旧键（现在不再读取）
+      altar: 0.3 # 破阵每秒
+      rescue: 5.0 # 每次救援
+      survive: 10.0 # 活到撤离的基础分
+  max-survivors: 4 # 单局逃生者上限（单只 AI 母体压不住更多人：1 母体对 4 逃生者）
+  queue: # 排队开局（/ghg join）：人凑够就自动开一局
+    enabled: true # 关掉后 /ghg join 直接拒绝，只能用 /ghga hunter start 手动开局
+    min-players: 2 # 凑够几个逃生者就进入开局倒计时
+    max-players: 4 # 队列人数上限（实际还会和 max-survivors 取小的那个）
+    wait-seconds: 90 # 凑人阶段最长等多久，到点人数还不够就取消队列
+    countdown-seconds: 15 # 凑够人之后的准备倒计时，到点自动开局
+    mother: AI # AI = 队列只排逃生者、开局刷 AI 母体；PLAYER = 从队列里随机抽一人当母体（不看入队顺序）
+  test:
+    preparation-seconds: 10 # 单人测试模式的准备阶段时长（测试局随时可换母体种类，这里只影响开局节奏）
+    ignore-skill-cooldown: false # 技能冷却任何模式都生效；设 true 才会在测试局给玩家母体免冷却（调技能用）
+    dummy-count: 2 # 母体测试时生成几个「会躲的测试假人」
+    dummy-hits: 2 # 假人被打几下算打倒
+    dummy-flee-range: 14.0 # 母体进到这个距离内假人开始跑
+    dummy-flee-distance: 8.0 # 假人一次往反方向跑多远
+  points:
+    randomize: true # 法阵与逃脱点每局从 3x3 九宫格候选池里随机抽；false = 固定矩阵，方便调试
+    multi-floor: true # 多层猎场：每列从上到下所有能站的地面（二层、阁楼、平台）都可能落点
+    max-height-diff: 0 # 候选点与「发起者站位」允许的最大高度差（0 = 不限；只在 multi-floor 关闭时固定按 12 格）
+  altar:
+    count: 4 # 单局法阵数量（默认 4，最多 8）；填 0 = 随人数自动（ceil(人数/2)，上限 max）
+    max: 8 # 自动法阵数上限
+    size: 1 # 法阵尺寸：1 = 1x1，2 = 2x2
+    progress-per-second: 1.8 # 单人按住 Shift 的基准进度；**实际涨速封顶为它的 0.9 倍**，再乘在场蓄力者里最高的职业权重（多人不叠加；工程师 1.25 → 2.03%/秒）。1.8 时单人推满一座约 62 秒（破阵石 ×2 时约 31 秒）
+    decay-per-second: 1.5 # 母体守机时每秒掉的进度（大于涨速 → 被守时进度会倒退）
+    decay-radius: 6.0 # 母体进入这个半径内，法阵开始掉进度
+    group-bonus: 0.5 # 旧键：涨速已封顶为单人 0.9 倍，多人不再叠加，此项不再生效
+    harden-seconds: 50 # 加固后人类多少秒内破不了
+    harden-hits: 16 # 母体连续打碎地砖（樱花树叶）几次 → 加固这座阵
+    harden-reset-seconds: 10 # 中断多久算「不连续」（重新从 0 数；0 = 不清零）
+    harden-cooldown-seconds: 60 # 加固成功之后的冷却（秒）：这段时间里打地砖不计数（0 = 不限）
+    charge-tick-ticks: 10 # 蓄力时的「哒哒哒」滴答间隔（刻，10 = 每 0.5 秒一记；0 = 关）
+    max-chargers: 2 # 同一座阵最多几个人一起破：2 = 两个人的涨速叠加，第 3 个人起不再加算（0 = 不限）
+    paralyze: # 单座法阵推进到 at% 就瘫痪一段时间：不能继续推、也不能加固
+      enabled: true
+      at: 20 # 第一次跨过这个百分比就瘫痪（每座阵只触发一次；0 或 >=100 = 不触发）
+      seconds: 60 # 瘫痪多久
+    locator: # 定时把未完成法阵的坐标通报给逃生者
+      enabled: true
+      interval-seconds: 60 # 每 60 秒报一次并打一道光柱
+  escape:
+    hold-seconds: 4 # 在逃脱点按住 Shift 待满多少秒算撤离成功
+    radius: 3.0 # 逃脱点半径
+  chest: # 道具**只从道具箱出**，不往地上丢
+    count: 3 # 开局放几个
+    max: 10 # 全场同时最多几个西瓜
+    wave-interval-seconds: 40 # 每 40 秒补一波
+    wave-per-round: 2 # 一波补几个（补到 max 为止）
+    material: MELON # 道具箱方块（可破坏，默认西瓜）
+    hits-required: 5 # 敲破需要敲几下
+    drops: 2 # 敲破后给几件（第一件固定是应急口粮）
+  downed:
+    hit-slow-level: 1 # 旧键（命中减速已废弃）
+    hit-burst-seconds: 0 # 旧键（改为 hit-speed-ticks）
+    hit-burst-level: 2 # 旧键
+    hit-speed-ticks: 40 # 被打中后获得加速的时长（刻，40 = 2 秒）；命中瞬间不减速
+    hit-speed-level: 2 # 加速等级（2 = 速度Ⅱ）
+    post-slow-ticks: 30 # 加速结束后力竭：缓慢 30 刻（1.5 秒）
+    post-slow-level: 1
+    hits-to-down: 2 # 被母体打几下会被击倒
+    glow-seconds: 4
+    damaged-health: 6 # 受伤（流血）时的血量 = 3 颗心
+    downed-health: 2 # 倒地时的血量 = 1 颗心 # 击倒与救起后的发光时长（秒，别调太长：MC 的发光是全服可见）
+    rescue-limit: 1 # 每个人一局最多被救几次（防止无限打-救循环）
+    rescue-radius: 2.5 # 救援者要凑多近才能开始救
+    rescue-seconds: 3 # 按住 Shift 持续多少秒才救起（松手/走开/被打断都重来）
+    recover-seconds: 15 # 倒地后没人处理，多少秒自己爬回「流血（受伤）」状态（0 = 关闭）
+    bleedout-seconds: 60 # 旧规则：仅在关闭自动恢复且椅子也关闭时才会走到
+    rescue-health: 1 # 被救起后的状态：0 = 健康，1 = 受伤（受伤才需要治疗）
+    rescue-protect-seconds: 3 # 被救下后打不动的受击保护时长
+    hit-slow-seconds: 2 # 被母体打中后的减速时长（被打懵的重感）
+  chair: # 狂欢之椅：倒地后被母体抱到**法阵**上钉住，该法阵随即失效（替代「倒地放血淘汰」）
+    enabled: true # 关掉则退回放血规则
+    count: 3 # 旧键（椅子不再单独生成，已不再读取）
+    first-seconds: 60 # 第一次上椅倒计时（秒）
+    second-seconds: 30 # 第二次上椅倒计时（秒）
+    third-instant: true # 旧键（第三次改成固定倒计时，不再读取）
+    third-seconds: 5 # 第三次上椅的倒计时（秒），到点爆炸放飞
+    struggle-seconds: 8 # 被抱着时按住 Shift 挣扎，几秒挣脱
+    ai-camp-seconds: 10 # AI 母体钉完人后在椅子边守多久（秒）
+    rescue-seconds: 4 # 队友按住 Shift 多久把人救下来
+    grab-seconds: 2.0 # 玩家母体按住 Shift 贴多久把人抱起来
+    carry-speed: 0.75 # 抱着人时母体的移速倍率
+  heal:
+    min-food: 8 # 自愈至少要这么多饱食度（饿着治不了伤）
+    enabled: true # 受伤状态与治疗：挨过一次但还没倒的人可以治回健康
+    other-seconds: 8 # 队友蹲在旁边按住 Shift 治疗要几秒
+    self-seconds: 16 # 自己蹲着自愈要几秒（慢一倍）
+    radius: 2.5
+    decay: true # 中断后进度是否回退
+  trail:
+    enabled: true # 抓痕（移动扬尘）与血迹（受伤/倒地暗红粒子）
+  # vault: 翻越点已删除（下面这些键保留但不再读取）
+  role:                       # 逃生者职业
+    enabled: true             # 关掉则每局不分配职业、也不发职业技能道具
+    refresh-seconds: 60       # 技能道具补发的兜底冷却（下面按职业单独配的优先）
+    refresh: # 各职业技能道具冷却（秒）
+      ICER: 55
+      GUARDIAN: 45
+      LANCER: 40
+      ENGINEER: 45
+      RUNNER: 35
+    fence-width: 3            # 工程师一次架几格宽
+    fence-height: 2           # 栅栏几格高
+    fence-refresh-seconds: 45 # 栅栏工具用掉后多久补发（秒）
+    fence-hits: 3 # 栅栏要打几下才塌（母体 / 工程师都一样）
+  items: # GHG 专属道具（只列 GHG 真正会读的）
+    ice-ball: # 凝冰球命中母体时的眩晕（职业 / 箱子道具共用）
+      mother-stun-seconds: 4 # 砸中母体的眩晕时长（抱着人时被打断、倒地者落地）
+    adrenaline: # 肾上腺素（跑者职业技能）：GHG 弱化版，短时加速 + 后遗症
+      duration-seconds: 4 # 加速时长
+      speed-level: 1 # 1 = 速度Ⅰ
+      after-slow-seconds: 2 # 加速结束后的缓慢时长（0 = 无后遗症）
+    ration: # 应急口粮：饱食度真的会掉光，箱子必出一份
+      restore-food: 6 # 每口恢复多少点饱食度
+      restore-saturation: 4.0 # 每口恢复多少饱和度
+      bites: 1 # 一份能吃几口（1 = 一次性）
+      chest-weight: 4 # 在道具箱随机池里的权重（1 = 和别的道具等权；0 = 不进池）
+      guaranteed-in-chest: false # 每个道具箱必出一份；false = 只从随机池抽（不保证每次都有）
+    ritual-knife:
+      progress: 10 # 旧键（现在不再直接加进度，改成加速），已不再读取
+      boost-seconds: 20 # 使用后当前法阵「破解速度 ×倍率」持续多少秒
+      boost-multiplier: 2.0 # 加速倍率（2.0 = 破解速度翻倍）
+      cooldown: 30 # 使用冷却（秒）
+    medkit:
+      instant: true # 医疗包立刻治好受伤
+    shadow-cloak: # 黑衣人的隐身道具
+      seconds: 6 # 隐身时长（母体的被动发光照旧能看到轮廓）
+  hatch: # 只剩 1 人时开放地窖（点位是随机一座法阵）
+    enabled: true
+    radius: 2.5
+  endgame:
+    enabled: true # 法阵全破后开始终局倒计时，不走就一起被埋
+    seconds: 90
+  hunger: # 人类阵营饱食度加压（母体不受影响）
+    enabled: true
+    start-saturation: 5.0 # 进对局时的饱和度（越小饱食度掉得越快；20 = 基本不掉）
+    amplifier: 1 # 饥饿等级：0 = 饥饿Ⅰ，1 = 饥饿Ⅱ
+    interval-seconds: 2 # 每隔多少秒补一次饥饿效果
+    low-food-slowness: true # 食物见底时追加缓慢
+    low-food-threshold: 6 # 食物低于等于多少算见底
+  particles: # 粒子表现（4 刻刷新一次）
+    enabled: true
+    altar-ring-points: 16 # 法阵粒子圈采样点数，越大越圆越费
+    altar-beam-in-preparation: true # 准备阶段给法阵打信标光柱
+    beam-height: 24 # 信标光柱高度（格）
+    mother-marker: true # 母体头顶挂粒子标记（粒子全球可见，等于暴露她的位置）
+  bossbar:
+    altars: true # 用 BossBar 显示法阵破除进度
+    show-to-mother: true # 进度条是否也给玩家母体看
+  heartbeat:
+    enabled: true # 心跳声：从母体位置发出，只有附近的逃生者能听到
+    range: 48.0 # 超过这个距离没有心跳；越近跳得越密越响（最小按 48 格算）
+  mother:
+    ai-count: 2 # AI 母体一次刷几个（出生在场地不同位置）
+    kind: RANDOM # RANDOM = AI 每局从 enabled-kinds 随机；也可固定成某一类
+    enabled-kinds: # 允许出现的母体种类
+      - SPRINTER # 疾行者：疾跑（短时间加速）
+      - CHARGER # 冲撞者：冲刺（朝面向方向猛冲）
+      - ARCHER # 射手：箭矢（命中减速）
+      - ALCHEMIST # 炼金者：药水（投掷减速药水）
+      - WALKER # 穿隙者：传送（传送到目标身边，自己硬直）
+      - WATCHER # 窥视者：视野（站着不动时透视）
+      - WEAVER # 缚网者：缚网（以自身为中心 7 格减速）
+      - PEARL_LADY # 珍珠女士：珍珠传送（闪到准星方向，落地后自己缓慢，打中人立刻解除）
+    type: AUTO # AUTO = 用种类自带的默认外观；也可填 ZOMBIE / SKELETON 等锁死外观
+    kind-cost: # 玩家母体选这个种类要交多少入场费（按强度递增，疾行者免费）
+      SPRINTER: 0
+      CHARGER: 100
+      ARCHER: 120
+      ALCHEMIST: 100
+      WALKER: 150
+      WATCHER: 180
+      WEAVER: 120
+    skill-cooldown: 0 # 技能冷却统一覆盖（秒），0 = 用各技能自己的冷却
+    skill-slow-seconds: 3 # 技能命中后的减速时长
+    skill-slow-level: 1 # 技能命中后的减速等级
+    player-mode:
+      enabled: true # 允许玩家扮演母体：/ghga hunter mother <玩家>
+      speed-level: 1 # 玩家母体的速度等级（0 = 不加成）
+    speed: 0.26 # 母体移动速度【绝对值】（人类道具多，0.21 追不上）。原版僵尸 0.23、蜘蛛 0.30、骷髅 0.25；越小越慢
+    attack-range: 2.2 # 攻击判定距离
+    attack-cooldown-seconds: 5 # 攻击冷却（秒）。追上之后连着两下必杀太凶，所以拉长到 5 秒
+    axe-recover-seconds: 3 # 斧头砍出后多久回到手上（秒）
+    attack-cooldown: 3 # 旧键（Gost 时代的 3 秒），已不再读取
+    recover-seconds: 2 # 命中后的后摇（秒）：这段时间母体不追、不砍、不放开
+    recover-level: 4 # 后摇期间的缓慢等级（4 = 超慢，原地僵直感）
+    hit-recover-seconds: 2 # 旧键，已不再读取
+    hit-recover-level: 1 # 旧键，已不再读取
+    sense-range: 60.0 # 索敌半径
+    chase: # 追击手感（妈妈 AI 想更聪明主要靠这几项）
+      pathfinder: true # 用 Paper Pathfinder 走向「预判点」，比原版直追更会拐弯；没 Paper 自动退回原版
+      speed: 1.15 # 寻路速度倍率（1.0 = 母体自身移速；值越大贴得越紧）
+      lead-seconds: 0.5 # 预判提前量（秒）：朝目标 0.5 秒后的位置走，切角更准
+    line-of-sight: true # 卡视野：墙后看不见就不追（真的能躲）；正在破阵的人靠声音仍能被感知
+    close-range: 6.0 # 这么近一定看得见（不用管视线）
+    hear-range: 20.0 # 破阵声音的感知半径：看不见但正在推阵的人在范围内仍会被找到
+    max-climb: 3.0 # 目标与你高差超过这么多时判为「够不着」：不追，防止在墙根原地抽搐
+    juke-speed: 1.0 # 绕后 / 假动作时的移动速度倍率（Pathfinder 的 speed）
+    # 绕后：目标背对你时绕到侧后方再压上去（同一个目标只绕一次）
+    flank:
+      enabled: true
+      range: 12.0 # 进入这个距离才考虑绕后
+      min-range: 4.0 # 比这更近就直接砍，不绕
+      dot: 0.35 # 目标的「背对程度」要超过这个值（1 = 完全背对）
+      offset: 4.0 # 侧移多少格
+      max-seconds: 3 # 绕后最多走这么久，到点改直线
+      cooldown-seconds: 8 # 两次绕后之间至少隔这么久
+    # 假动作：目标正盯着你时，小概率先横向窜一下再压上去
+    feint:
+      enabled: true
+      chance: 35 # 触发概率（百分比，每次判定一次）
+      seconds: 1 # 横向窜多久
+      cooldown-seconds: 12
+    search-seconds: 8 # 目标跑掉后，先去最后已知位置找多少秒
+    altar-priority-bonus: 12.0 # 正在破阵的人在目标评分里优先多少格
+    passive-sight: # 所有母体共用：站住不动够久就让射程内逃生者发光
+      enabled: true
+      stationary-seconds: 3 # 站住多久开始透视
+      range: 40.0 # 透视作用半径
+    patrol:
+      enabled: true # 没人可追时去守未完成的法阵
+      speed: 1.0 # 巡逻移动速度倍率
+      prefer-charging: true # 优先去「有人正在推」的那座阵，而不是单纯最近的
+      skip-hardened: true # 刚被自己加固的阵（人类破不了）不守
+      stand-offset: 3.0 # 守机时站到阵心外侧多少格（0 = 站阵心）
+    spawn-distance: 12.0 # 开局时母体与最近逃生者的距离
+    jump-boost-level: 3 # AI 母体的跳跃提升等级（3 ≈ 跳 3 格高；0 = 关闭。玩家母体不受影响）
+    stuck-box: 4.0 # AI 母体活动范围不超过这么多格，就算「没在动」
+    stuck-seconds: 3 # 在这个范围里待够多少秒算卡住（原来 6 秒太钝，像在发呆）
+    stuck-escape: nudge # 卡住怎么脱困：nudge = 只在原地往旁边/台阶上挤 2~3 格（默认）；
+                        # off = 完全不处理，只写日志。**不会再把母体瞬移到逃生者身边**
+    skills: # 各技能自己的参数
+      sprint:
+        cooldown: 20
+        seconds: 6 # 加速持续秒数
+        level: 1 # 速度等级
+      dash:
+        cooldown: 16
+        power: 2.6 # 冲刺力度（2.6 ≈ 冲刺 8~9 格）
+        stun-ticks: 40 # 撞到人之后眩晕多久（刻，40 = 2 秒）
+        stun-radius: 2.2 # 撞击判定半径
+        stun-window-ticks: 32 # 冲出去之后多少刻内还算撞击窗口
+      arrow:
+        cooldown: 16
+        slow-seconds: 6 # 射手：长时间重减速（失能型）
+        slow-level: 2 # 缓慢Ⅱ
+      potion:
+        cooldown: 18
+        radius: 3.0 # 炼金者弩箭命中后的喷溅半径
+        slow-seconds: 3 # 比射手弱一档、时间也短
+        slow-level: 1
+      pearl:
+        cooldown: 24
+        distance: 10.0 # 朝准星闪的最远格数
+        slow-seconds: 4 # 传送后自己缓慢Ⅰ的秒数
+        slow-level: 1 # 缓慢等级（1 = 缓慢Ⅰ）
+      teleport:
+        cooldown: 28
+        freeze-seconds: 2 # 传送后母体自己硬直秒数（禁止移动与互动）
+        distance: 8.0 # 玩家母体「朝准星闪」的最远格数（从远往近找落脚点，AI 走「贴到目标背后」）
+      vanish:
+        cooldown: 28
+        seconds: 7 # 窥视者隐身时长
+        speed-level: 2 # 隐身期间的加速等级（打中人立刻取消）
+      snare:
+        cooldown: 18
+        radius: 7.0 # 以母体为中心向四周展开的半径

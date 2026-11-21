@@ -1,0 +1,47 @@
+name: GHG
+version: 1.0.0
+main: io.Sriptirc_wp_1258.gost.GHG
+api-version: 1.20
+description: Gost's HunterGame - PVE 逃亡玩法，AI 母体猎杀，破法阵撤离
+author: ScriptIrc
+website: https://scriptirc.com
+
+# 服务端支持矩阵（与 Gost 本体一致）
+# | 服务端 | 支持 | 说明 |
+# |--------|------|------|
+# | Bukkit / Spigot / Paper / Purpur | 完整 | 同一套 Bukkit API + ApiCompat 跨版本 |
+# | Folia | 调度兼容 | ServerCompat/SchedulerCompat；玩法为单线程模型，属尽力兼容 |
+# | Sponge | 不支持 | 非 Bukkit API，需独立移植 |
+# | BungeeCord / Velocity / Waterfall | 不适用 | 代理端，本插件是游戏后端玩法插件 |
+
+folia-supported: true
+
+depend: [Vault]
+# Gost 本体不是必需依赖：GHG 自带完整道具与基础设施，可独立运行；
+# 装了 Gost 也能并存（插件名/命令/计分板队伍都不同）。
+softdepend: [Gost]
+
+commands:
+  ghg:
+    description: 玩家命令 - 排队开局 / 退出对局 / 状态 / 母体种类菜单 / 职业 / 语言
+    usage: /<command> [menu|join|leave|spectate|info|kind|role|lang|help]  (无参数 = 图形菜单)
+  ghga:
+    description: 管理员命令 - GHG 对局、猎场圈地、道具
+    usage: /<command> [hunter|mode|tool|pos1|pos2|save|list|load|delete|info|clear|giveitem|reload|status|selftest|lang|help]
+
+permissions:
+  ghg.use:
+    description: 允许使用基础命令
+    default: true
+  ghg.player:
+    description: 允许玩家使用基本命令
+    default: true
+  ghg.join:
+    description: 允许加入对局
+    default: true
+  ghg.leave:
+    description: 允许退出对局
+    default: true
+  ghg.admin:
+    description: 管理员权限
+    default: op
