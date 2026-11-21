@@ -2,6 +2,9 @@
 
 [中文](#中文) · [English](#english)
 
+**在线文档 / Online docs** — <https://726113394-cloud.github.io/GHG/>
+（HTML 版，含目录与流程图；本文件仍是同一份内容的纯文本版）
+
 **PvE 逃亡玩法插件** — AI 母体在猎场里追杀，逃生者一边躲一边一座座推开法阵，全部推满后跑到逃脱点撤离。
 **PvE escape-mode plugin** — an AI Mother hunts inside the arena while survivors charge altars one by one,
 then run for the escape point.
@@ -441,7 +444,7 @@ AI 母体在索敌范围内自动放技能；玩家母体**拿着「技能道具
 | **传送珍珠** | 末影珍珠 | 右键投掷传送，CD 10 秒 |
 | **漂浮药水** | 滞留药水 | 漂浮 **6 秒**、**漂浮Ⅱ**（`items.levitation.duration-ticks` / `amplifier`）；**无冷却**，靠瓶数限速；池子里**加权 3 倍**（`chest-weight`）。两瓶是两件独立道具，用一瓶只消耗一瓶 |
 | **凝冰球（通用）** | 雪球 | 从箱子出的那一颗，**无冷却**；砸中母体眩晕 4 秒并让她松手，砸中逃生者减速。和冰球手的**职业凝冰球是两件独立道具**（ID / 冷却分开，互不影响） |
-| **冲刺矛（通用）** | 长矛 / 三叉戟 | 右键朝准星突进约 **7–8 格**（`spear-rush.velocity` 1.6），用掉即消失。和突击手的**职业冲刺矛是两件独立道具** |
+| **冲刺矛（通用）** | 长矛 / 三叉戟 | 右键朝准星突进约 **7–8 格**（`spear-rush.velocity` 1.6），用掉即消失。和突击手的**职业冲刺矛是两件独立道具**。**服务端有「矛」（`GOLDEN_SPEAR`）时用长矛外观，没有就自动用三叉戟，功能完全一致** |
 | **选择面板** | 时钟 | **准备阶段专属**，不进箱子。左键或右键打开菜单：逃生者是职业菜单、玩家母体是母体种类菜单；开打自动收走，不能丢 |
 | **眩晕药水** | 喷溅药水 | 右键投掷：**砸中母体立刻定身 1.5 秒**（`items.stun-potion.stun-ticks`），期间**不能移动、不能放技能、不能敲箱子**；没砸到就白费一瓶 |
 | **臭牛排** | 熟牛肉 | **按住右键真吃**（原版进食动作 + 进度条，松手/换物品会打断），吃完给速度Ⅰ 6 秒 + **自己发光 5 秒**（发光就是代价），另补 **3 点饱食度 + 1 饱和度**（不多，但能垫一口）；饱食度满 20 时和面包一样提示「先消耗掉一点」 |
@@ -1326,7 +1329,7 @@ Survivor pool (`ItemIds.survivorPool`; role skill items are **not** in it):
 | **Teleport Pearl** | ender pearl | Throw to teleport, cooldown 10 s |
 | **Levitation Potion** | lingering potion | Levitation **6 s**, **level II**, **no cooldown**; weight **3**. Two bottles are two items, and using one consumes one |
 | **Common Ice Ball** | snowball | The chest version, **no cooldown**; hitting the Mother stuns her 4 s and makes her drop a carried survivor, hitting a survivor slows them. **Separate from the ICER role item** |
-| **Common Spear Rush** | spear / trident | Dashes ~**7–8 blocks** toward the crosshair, consumed on use. **Separate from the LANCER role item** |
+| **Common Spear Rush** | spear / trident | Dashes ~**7–8 blocks** toward the crosshair, consumed on use. **Separate from the LANCER role item**. **Uses the spear model when the server has `GOLDEN_SPEAR`, otherwise falls back to the trident — identical behaviour** |
 | **Stun Potion** | splash potion | Throw it: **hitting the Mother pins her for 1.5 s** — she cannot move, cast, open chests or use items. A miss wastes the bottle |
 | **Selection Panel** | clock | **Preparation-only**, never in chests. Left/right-click opens the role menu (survivors) or kind menu (player Mother); removed at match start, cannot be dropped |
 | **Stinky Steak** | cooked beef | **Hold right-click to actually eat** (vanilla animation + progress bar); grants Speed I 6 s + **self-glow 5 s** (the glow is the price) and restores **3 food + 1 saturation**. Cannot be used at full hunger |
