@@ -24,10 +24,13 @@ public interface ItemEffect {
 
     /**
      * 这种点击方式能不能触发本效果。
-     * 默认左右键都行；只有右键的写成 {@code return rightClick;}。
+     *
+     * <p>⚠️ **默认只认右键**。原来默认是左右键都触发，于是「敲道具箱时多按的那一下左键」
+     * 会把传送珍珠扔出去、把控魂术按掉、把漂浮药水喝掉 —— 玩家只是想继续砸箱子。
+     * 需要左键的（准备阶段的选择面板）自己覆写成 {@code return true;}。</p>
      */
     default boolean accepts(boolean rightClick, boolean leftClick) {
-        return rightClick || leftClick;
+        return rightClick;
     }
 
     /**

@@ -284,12 +284,16 @@ public class HunterGameManager {
     private final Map<UUID, Location> dummyWander = new HashMap<>();
     private final Map<UUID, Long> dummyWanderUntil = new HashMap<>();
     private final Map<UUID, Location> dummyLastPos = new HashMap<>();
+    /** 假人从什么时候开始连续逃跑（0 = 没在逃）；用来做体力耗尽 */
+    private final Map<UUID, Long> dummyFleeSince = new HashMap<>();
+    /** 假人体力耗尽、站着喘到什么时候 */
+    private final Map<UUID, Long> dummyTiredUntil = new HashMap<>();
     /** 假人移动任务：4 刻一次，自己推速度（AI 已关） */
     private ServerCompat.Cancellable dummyTask;
 
     /** 假人逃跑 / 游荡的推进速度（格每刻，玩家步行约 0.21） */
-    /* 每刻推一次的口径（原来 4 刻一次，0.30 相当于平均 0.07/刻，几乎不动） */
-    private static final double DUMMY_FLEE_SPEED = 0.24;
+    /* 每刻推一次的口径（原来 4 刻一次，0.30 相当于平均 0.07/刻，几乎不动）。
+       逃跑速度已改为可配置（hunter.test.dummy-flee-speed），这里只留游荡速度。 */
     private static final double DUMMY_WANDER_SPEED = 0.10;
 
     /** 下次补假人的时间戳 */
@@ -608,6 +612,8 @@ public class HunterGameManager {
         rescueCounts.clear();
         earlySettled.clear();
         spectatorWarnAt.clear();
+        dummyFleeSince.clear();
+        dummyTiredUntil.clear();
         chairCount.clear();
         chairTicks.clear();
         carriedId = null;
@@ -2418,6 +2424,8 @@ public class HunterGameManager {
         dummyWander.remove(id);
         dummyWanderUntil.remove(id);
         dummyLastPos.remove(id);
+        dummyFleeSince.remove(id);
+        dummyTiredUntil.remove(id);
         try {
             dummy.remove();
         } catch (Throwable ignored) {
@@ -2463,6 +2471,8 @@ public class HunterGameManager {
                 dummyWander.remove(id);
                 dummyWanderUntil.remove(id);
                 dummyLastPos.remove(id);
+                dummyFleeSince.remove(id);
+                dummyTiredUntil.remove(id);
             }
         }
     }
@@ -2508,23 +2518,51 @@ public class HunterGameManager {
                 && last.distanceSquared(current) < 0.0036;
             dummyLastPos.put(id, current.clone());
 
-            boolean fleeing = motherLocation != null
+            boolean motherNear = motherLocation != null
                 && mob.getWorld() == motherLocation.getWorld()
                 && current.distance(motherLocation) <= fleeRange;
 
-            if (fleeing) {
-                org.bukkit.util.Vector away = current.toVector()
-                    .subtract(motherLocation.toVector());
-                away.setY(0);
-                if (away.lengthSquared() < 0.01) {
-                    away = new org.bukkit.util.Vector(random.nextDouble() - 0.5, 0, random.nextDouble() - 0.5);
+            /* 逃跑不能是「永久无解」：原来假人只要在 14 格内就朝反方向一直跑，
+               而且速度几乎和母体一样快 —— 测试时永远追不上、一次都砍不到。
+               现在给它体力：连逃 N 秒后站着喘 M 秒（这段时间就是给母体砍的窗口）。 */
+            long now = System.currentTimeMillis();
+            Long tired = dummyTiredUntil.get(id);
+            boolean exhausted = tired != null && now < tired;
+
+            if (motherNear && !exhausted) {
+                long since = dummyFleeSince.getOrDefault(id, 0L);
+                if (since == 0L) {
+                    since = now;
+                    dummyFleeSince.put(id, since);
                 }
-                Location target = current.clone().add(away.normalize().multiply(fleeDistance));
-                dummyWander.remove(id);
-                dummyWanderUntil.remove(id);
-                steer(mob, target, DUMMY_FLEE_SPEED, stuck);
-                rescueStuckDummy(mob, target, DUMMY_FLEE_SPEED, stuck);
+                int fleeSeconds = plugin.getConfigManager().getHunterTestDummyFleeSeconds();
+                int tiredSeconds = plugin.getConfigManager().getHunterTestDummyTiredSeconds();
+                boolean spent = fleeSeconds > 0 && now - since >= fleeSeconds * 1000L;
+
+                if (spent) {
+                    // 体力见底：停下喘气，清空计时，等上一会儿才能再跑
+                    dummyFleeSince.remove(id);
+                    dummyTiredUntil.put(id, now + tiredSeconds * 1000L);
+                    steer(mob, current.clone(), 0.0, false);
+                } else {
+                    org.bukkit.util.Vector away = current.toVector()
+                        .subtract(motherLocation.toVector());
+                    away.setY(0);
+                    if (away.lengthSquared() < 0.01) {
+                        away = new org.bukkit.util.Vector(random.nextDouble() - 0.5, 0, random.nextDouble() - 0.5);
+                    }
+                    Location target = current.clone().add(away.normalize().multiply(fleeDistance));
+                    dummyWander.remove(id);
+                    dummyWanderUntil.remove(id);
+                    double fleeSpeed = plugin.getConfigManager().getHunterTestDummyFleeSpeed();
+                    steer(mob, target, fleeSpeed, stuck);
+                    rescueStuckDummy(mob, target, fleeSpeed, stuck);
+                }
             } else {
+                if (!motherNear) {
+                    dummyFleeSince.remove(id);
+                    dummyTiredUntil.remove(id);
+                }
                 steer(mob, nextWanderTarget(mob, id), DUMMY_WANDER_SPEED, stuck);
             }
         }

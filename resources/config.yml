@@ -174,6 +174,9 @@ hunter:
     ignore-skill-cooldown: false # 技能冷却任何模式都生效；设 true 才会在测试局给玩家母体免冷却（调技能用）
     dummy-count: 2 # 母体测试时生成几个「会躲的测试假人」
     dummy-hits: 2 # 假人被打几下算打倒
+    dummy-flee-speed: 0.14 # 假人逃跑速度（每刻，0.14 ≈ 2.8 格/秒）：比母体慢才追得上
+    dummy-flee-seconds: 3 # 连续逃多少秒就体力耗尽（0 = 永不累）
+    dummy-tired-seconds: 2 # 体力耗尽后站着喘多久（这段时间能被砍到）
     dummy-flee-range: 14.0 # 母体进到这个距离内假人开始跑
     dummy-flee-distance: 8.0 # 假人一次往反方向跑多远
   points:
@@ -273,7 +276,7 @@ hunter:
     adrenaline: # 肾上腺素（跑者职业技能）：GHG 弱化版，短时加速 + 后遗症
       duration-seconds: 4 # 加速时长
       speed-level: 1 # 1 = 速度Ⅰ
-      after-slow-seconds: 2 # 加速结束后的缓慢时长（0 = 无后遗症）
+      after-slow-seconds: 1 # 加速结束后的缓慢时长（0 = 无后遗症）
     ration: # 应急口粮：饱食度真的会掉光，箱子必出一份
       restore-food: 6 # 每口恢复多少点饱食度
       restore-saturation: 4.0 # 每口恢复多少饱和度

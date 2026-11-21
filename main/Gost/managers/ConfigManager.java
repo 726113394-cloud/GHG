@@ -12,7 +12,7 @@ public class ConfigManager {
      * GHG 自己的配置版本，从 1 开始 —— 和 Gost 的版本号（当时 34+）无关。
      * 只要改了 config.yml 的结构就 +1；读到的版本不一致会自动迁移并备份。
      */
-    private static final int CURRENT_CONFIG_VERSION = 30;
+    private static final int CURRENT_CONFIG_VERSION = 31;
 
     /** 配置版本号的主键（GHG 自己的） */
     private static final String VERSION_KEY = "ghg-config-version";
@@ -430,6 +430,20 @@ public class ConfigManager {
                 plugin.saveConfig();
                 plugin.getLogger().info("调参升级（v30）：母体卡住判定 6 → 3 秒");
             }
+        }
+
+        // v31：跑者后遗缓慢 2 → 1 秒；新增假人体力/速度配置（只改仍是旧默认值的）
+        if (savedVersion < 31) {
+            int t = 0;
+            t += retuneInt("hunter.items.adrenaline.after-slow-seconds", 2, 1);
+            if (t > 0) {
+                config.set(VERSION_KEY, CURRENT_CONFIG_VERSION);
+                plugin.saveConfig();
+                plugin.getLogger().info("调参升级（v31）：跑者后遗缓慢 2 → 1 秒");
+            }
+            config.options().copyDefaults(true);
+            config.set(VERSION_KEY, CURRENT_CONFIG_VERSION);
+            plugin.saveConfig();
         }
 
         // 设置默认值
@@ -1456,6 +1470,24 @@ public class ConfigManager {
         return Math.max(0, config.getInt("items.ritual-knife.cooldown", 30));
     }
 
+    /** 假人逃跑速度（每刻速度值，0.14 ≈ 2.8 格/秒） */
+    public double getHunterTestDummyFleeSpeed() {
+        ensureConfigLoaded();
+        return Math.max(0.04, config.getDouble("hunter.test.dummy-flee-speed", 0.14));
+    }
+
+    /** 假人连续逃跑多少秒后体力耗尽（0 = 永不累） */
+    public int getHunterTestDummyFleeSeconds() {
+        ensureConfigLoaded();
+        return Math.max(0, config.getInt("hunter.test.dummy-flee-seconds", 3));
+    }
+
+    /** 假人体力耗尽后站着喘多久（秒） */
+    public int getHunterTestDummyTiredSeconds() {
+        ensureConfigLoaded();
+        return Math.max(0, config.getInt("hunter.test.dummy-tired-seconds", 2));
+    }
+
     /** 是否允许观战（对局已开始时） */
     public boolean isHunterSpectateEnabled() {
         ensureConfigLoaded();
@@ -2014,7 +2046,7 @@ public class ConfigManager {
     /** 加速结束后的后遗症：缓慢几秒（0 = 没有） */
     public int getHunterAdrenalineAfterSlowSeconds() {
         ensureConfigLoaded();
-        return Math.max(0, Math.min(10, config.getInt("hunter.items.adrenaline.after-slow-seconds", 2)));
+        return Math.max(0, Math.min(10, config.getInt("hunter.items.adrenaline.after-slow-seconds", 1)));
     }
 
     /** 猎场保护：没管理权限的人在猎场里不能破坏/放置方块 */

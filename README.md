@@ -16,8 +16,8 @@ then run for the escape point.
 > [Gost](https://github.com/)** (item framework, area selection, localisation, cross-version layer).
 > **A later release will include a code audit that removes the leftover parts nobody uses any more.**
 >
-> 当前版本 **1.0.0，仍在开发中，尚未发版**。经典局说明见 `_upstream/README_gost_upstream.md`。
-> Current version **1.0.0 — still in development, not released**.
+> 当前版本 **1.0.1**。经典局说明见 `_upstream/README_gost_upstream.md`。
+> Current version **1.0.1**.
 
 本文档中英双语：上面是中文，下面是 English（点标题行右侧的 `English` 直接跳过去）。
 This file is bilingual: Chinese first, English below (use the `English` link above).
@@ -166,7 +166,7 @@ Java 版和基岩版的操作差异就卡在左右键上，所以 GHG 的关键�
 | 母体放技能 | **右键**（必须手持对应技能道具） |
 | 母体加固法阵 | 玩家母体**左键连打碎 16 次**法阵格上的粉红色染色玻璃（玻璃一碰就碎，打满 16 次该阵加固；加固后有 60 秒冷却；AI 母体不做这个动作） |
 | 工程师架栅栏 | **右键**（栅栏工具） |
-| 用道具 | **右键**（破阵石要在法阵上、医疗包要受伤时）；**准备阶段全部禁用** |
+| 用道具 | **右键**（破阵石要在法阵上、医疗包要受伤时）；**准备阶段全部禁用**。**左键不会触发任何道具**——敲箱子时多按的那一下不会把珍珠/控魂术/药水用掉 |
 | 重选职业 / 母体种类 | 准备阶段手里那块**钟表（选择面板）**：**左键或右键**都能打开对应菜单 |
 
 ## 三、规则细节
@@ -326,7 +326,7 @@ AI 母体局里冰球手不在菜单里。每个条目都把该职业说清楚�
 | **守护者** GUARDIAN | 救赎护符：15 秒内救人读条 **×3** | 45 秒 | 救援/治疗读条 **×1.3** | 60 |
 | **突击手** LANCER | 冲刺矛：短距突进（初速 **1.6**，约 **7–8 格**；和箱子里的**通用冲刺矛是两件独立道具**） | 40 秒 | 心跳听距 **×1.5**（听得更远） | 60 |
 | **工程师** ENGINEER | **栅栏工具**：右键架一段木栅栏 | 45 秒 | 破阵更快：蓄力上限 **×1.25**（**2.03%/秒**） | 40 |
-| **跑者** RUNNER | 肾上腺素：**速度Ⅰ 4 秒**，之后 **2 秒缓慢**（GHG 弱化版） | 35 秒 | — | 40 |
+| **跑者** RUNNER | 肾上腺素：**速度Ⅰ 4 秒**，之后 **1 秒缓慢**（GHG 弱化版） | 35 秒 | — | 40 |
 | **黑衣人** WRAITH | 隐身斗篷：**隐身 6 秒**。**母体静止 3 秒的被动透视照样能看到你的轮廓**（发光会让隐身显形），所以这是「躲视线」不是「无解消失」 | 40 秒 | — | 50 |
 
 **工程师的木栅栏**：右键在准星处的方块上方架 `fence-width × fence-height`（默认 3×2）的木栅栏，
@@ -567,7 +567,7 @@ AI 母体在索敌范围内自动放技能；玩家母体**拿着「技能道具
 
 ### 安装
 
-1. 把 `GHG_v1.0.0.jar` 丢进 `plugins/`
+1. 把 `GHG_v1.0.1.jar` 丢进 `plugins/`
 2. 需要奖池就装 **Vault** + 一个经济实现（EssentialsX Economy 等）；不装则整块经济功能自动关闭
 3. 重启，控制台会出现一张启动表（见下）
 4. `/ghga tool` 拿选区工具 → `/ghga pos1` `/ghga pos2` 圈猎场 → `/ghga save <名称>`
@@ -583,13 +583,13 @@ AI 母体在索敌范围内自动放技能；玩家母体**拿着「技能道具
 
 ```
 ==================================================
- GHG 1.0.0 · Gost's HunterGame
+ GHG 1.0.1 · Gost's HunterGame
  PvE 逃亡：AI 母体猎杀，逃生者破除全部法阵后撤离
 ==================================================
  命令      /ghg 玩家 · /ghga 管理
  服务端    Purpur 26.1.2-2570-e64b1b2 (MC: 26.1.2) [PURPUR]
  对局      准备 25s · 上限 900s · 法阵 4 座 · 母体 8 种
- 配置      v30（ghg-config-version）
+ 配置      v31（ghg-config-version）
  语言      zh_CN，1111 条 · 6 种语言
  经济      EssentialsX Economy
  猎场      tsgGHG
@@ -697,6 +697,9 @@ LanguageManager）原本那句「已加载…」已经撤掉，数据统一进�
 **母体测试用的假人不是摆设**：它们是关掉原版 AI、由插件**每刻**推一次速度的 villager ——
 （原来 4 刻推一次，速度每刻被地面摩擦吃掉一半，结果就是「几乎不动」）
 母体进了 `dummy-flee-range`（默认 14 格）就朝反方向跑 `dummy-flee-distance`（默认 8 格），
+速度由 `dummy-flee-speed`（默认 0.14，约 2.8 格/秒，**刻意比母体慢**）控制；
+**连跑 `dummy-flee-seconds`（默认 3 秒）后会体力耗尽，站着喘 `dummy-tired-seconds`（默认 2 秒）** ——
+这段就是母体真正能砍到它的窗口（以前它一直跑、速度还和母体相当，测试时一刀都打不着），
 平时在附近小范围游荡；前方一格被挡住时**只在落地那一下**给跳跃冲量翻过去。
 万一生成在石头缝里彻底卡死，会被**挪到旁边能站的地方**（只对假人做，玩家和母体绝不移位）。它们**不是无敌的**（无敌就收不到伤害事件），
 而是靠监听器把伤害 `setCancelled`：所以母体砍上去有击退、有红叉粒子、有受击音，
@@ -933,6 +936,10 @@ hunter:
       vanish:   { cooldown: 28, seconds: 7, speed-level: 2 }
       snare:    { cooldown: 18, radius: 7.0 }
       pearl:    { cooldown: 24, distance: 10.0, slow-seconds: 4, slow-level: 1 }
+  test:                        # 单人试玩（/ghga test / test mother）
+    dummy-flee-speed: 0.14     # 假人逃跑速度（每刻）：比母体慢才追得上
+    dummy-flee-seconds: 3      # 连逃几秒后体力耗尽（0 = 永不累）
+    dummy-tired-seconds: 2     # 力竭后站着喘几秒（这段能被砍到）
 ```
 
 道具侧的键（`items:` 段，和上面同级的顶层）：
@@ -955,7 +962,7 @@ items:
 ```
 
 改配置结构时三件套一起走：`ConfigManager.CURRENT_CONFIG_VERSION + 1`、CHANGELOG.md 记一笔、
-确认 `resources/config.yml` 里的新键。当前配置版本 **30**，键名是 **`ghg-config-version`**
+确认 `resources/config.yml` 里的新键。当前配置版本 **31**，键名是 **`ghg-config-version`**
 （GHG 自己的，与 Gost 的版本号无关，从 1 起算）。
 
 版本不匹配时会自动迁移：先把 config.yml 备份成 `config_old_v<旧版本>.yml`，再按新默认配置重写，
@@ -1168,7 +1175,7 @@ GHG is designed so that a Bedrock/Geyser player can play with a single key:
 | Mother: cast skill | **Right click** (must hold the skill item) |
 | Mother: harden an altar | **Left click** 16 times on the pink stained-glass tiles |
 | Engineer: place fence | **Right click** (Fence Kit) |
-| Use an item | **Right click** (locked during preparation) |
+| Use an item | **Right click** (locked during preparation). **Left click never triggers an item** — the extra click while breaking a chest no longer fires pearls, clocks or potions |
 | Re-pick role / Mother kind | **Left- or right-click** the clock (Selection Panel) |
 
 ## 3. Rule details
@@ -1268,7 +1275,7 @@ the difference in role tickets). A role decides both the **active skill item** a
 | **GUARDIAN** | Redemption Charm: rescue channel **×3** for 15 s | 45 s | rescue/heal channel **×1.3** | 60 |
 | **LANCER** | Spear Rush: short dash, velocity **1.6**, ~**7–8 blocks** (the common Spear Rush from chests is a **separate item**) | 40 s | heartbeat range **×1.5** | 60 |
 | **ENGINEER** | Fence Kit: right-click to place a wood fence | 45 s | faster charging: weight **×1.25** (**2.03 %/s**) | 40 |
-| **RUNNER** | Adrenaline: **Speed I for 4 s**, then **2 s of slowness** (weakened on purpose) | 35 s | — | 40 |
+| **RUNNER** | Adrenaline: **Speed I for 4 s**, then **1 s of slowness** (weakened on purpose) | 35 s | — | 40 |
 | **WRAITH** | Shadow Cloak: **invisible for 6 s**. The Mother's passive sight still outlines you (glowing beats invisibility), so it hides you from sight, not from her | 40 s | — | 50 |
 
 **Engineer's fence**: right-click places `fence-width × fence-height` (3×2) fence blocks at the crosshair.
@@ -1409,7 +1416,7 @@ the bar colour shifts. Toggle with `hunter.bossbar.altars`.
 
 ## 13. Install and run modes
 
-1. Drop `GHG_v1.0.0.jar` into `plugins/`
+1. Drop `GHG_v1.0.1.jar` into `plugins/`
 2. For the prize pool install **Vault** plus an economy provider (EssentialsX Economy etc.); without them
    the whole economy block disables itself
 3. Restart — the console prints a single startup table (below)
@@ -1426,13 +1433,13 @@ The console prints one GHG table (`StartupReport`) with real numbers, for exampl
 
 ```
 ==================================================
- GHG 1.0.0 · Gost's HunterGame
+ GHG 1.0.1 · Gost's HunterGame
  PvE 逃亡：AI 母体猎杀，逃生者破除全部法阵后撤离
 ==================================================
  命令      /ghg 玩家 · /ghga 管理
  服务端    Purpur 26.1.2-2570-e64b1b2 (MC: 26.1.2) [PURPUR]
  对局      准备 25s · 上限 900s · 法阵 4 座 · 母体 8 种
- 配置      v30（ghg-config-version）
+ 配置      v31（ghg-config-version）
  语言      zh_CN，1111 条 · 6 种语言
  经济      EssentialsX Economy
  猎场      tsgGHG
@@ -1517,8 +1524,10 @@ Permissions: `ghg.admin` (admin, default OP), `ghg.use` / `ghg.player` / `ghg.jo
 **The test dummies are not decoration**: they are villagers with vanilla AI disabled, pushed by the plugin
 **every tick** (a 4-tick interval let ground friction eat the velocity, which made them look motionless).
 When the Mother comes within `dummy-flee-range` (14 blocks) they run the opposite way for
-`dummy-flee-distance` (8); otherwise they wander nearby, jump over a one-block step **only when on the
-ground**, and if they end up hopelessly stuck they are moved to a standable spot (dummies only — never a
+`dummy-flee-distance` (8) at `dummy-flee-speed` (0.14 ≈ 2.8 blocks/s, **deliberately slower than the
+Mother**). After `dummy-flee-seconds` (3s) of sprinting they **run out of stamina and pant in place for
+`dummy-tired-seconds` (2s)** — that is the window where the Mother can actually land hits. They otherwise
+wander nearby, jump over a one-block step **only when on the ground**, and if they end up hopelessly stuck they are moved to a standable spot (dummies only — never a
 player or the Mother). They are **not invulnerable** (invulnerable entities never receive damage events);
 the listener cancels the damage instead, so hits still produce knockback, red-cross particles and a hurt
 sound, and the name tag shows the remaining hits. `dummy-hits` (2) downs one and a new one spawns 1 s later.
@@ -1655,6 +1664,10 @@ hunter:
       vanish:   { cooldown: 28, seconds: 7, speed-level: 2 }
       snare:    { cooldown: 18, radius: 7.0 }
       pearl:    { cooldown: 24, distance: 10.0, slow-seconds: 4, slow-level: 1 }
+  test:
+    dummy-flee-speed: 0.14     # slower than the Mother on purpose
+    dummy-flee-seconds: 3      # sprint time before stamina runs out
+    dummy-tired-seconds: 2     # panting window (open to hits)
 
 items:
   levitation: { duration-ticks: 120, amplifier: 1, cooldown: 0, chest-weight: 3 }
@@ -1664,7 +1677,7 @@ items:
 ```
 
 When you change the config structure, do all three at once: bump `ConfigManager.CURRENT_CONFIG_VERSION`,
-add a CHANGELOG entry, and update the keys in `resources/config.yml`. The current version is **30**
+add a CHANGELOG entry, and update the keys in `resources/config.yml`. The current version is **31**
 (key **`ghg-config-version`**, GHG's own counter, unrelated to Gost's versioning, starting at 1).
 
 Mismatched versions migrate automatically: the old `config.yml` is backed up to
@@ -1757,7 +1770,7 @@ Also fixed along the way: `ServerCompat.teleportSafely` now prefers `teleportAsy
   near a survivor
 - **The queue only starts matches, it does not switch maps**: the queue is empty after a match, you must
   `/ghg join` again. Spectating exists (`/ghg spectate`) but only while a match is running
-- **The bundled config template still says version 1**, so a fresh install runs the whole v1→v30 migration
+- **The bundled config template still says version 1**, so a fresh install runs the whole v1→v31 migration
   chain and leaves a `config_old_v1.yml` behind. Values converge to the current defaults; it is just an extra
   backup file
 - **Dead numbers in the startup table**: the "auto drop pool 4 kinds" counter is a leftover from the retired

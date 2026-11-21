@@ -1,5 +1,5 @@
 name: GHG
-version: 1.0.0
+version: 1.0.1
 main: io.Sriptirc_wp_1258.gost.GHG
 api-version: 1.20
 description: Gost's HunterGame - PVE 逃亡玩法，AI 母体猎杀，破法阵撤离
@@ -16,10 +16,10 @@ website: https://scriptirc.com
 
 folia-supported: true
 
-depend: [Vault]
-# Gost 本体不是必需依赖：GHG 自带完整道具与基础设施，可独立运行；
-# 装了 Gost 也能并存（插件名/命令/计分板队伍都不同）。
-softdepend: [Gost]
+# Vault 是**软依赖**：装了才有奖池与经济结算，没装则整块经济功能自动关闭
+# （ConfigManager/EconomyManager 都判了 vault == null，绝不会因为缺它而报错）。
+# 原来写成 depend 会让没装 Vault 的服务器直接拒绝加载本插件。
+softdepend: [Vault, Gost]
 
 commands:
   ghg:

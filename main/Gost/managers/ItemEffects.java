@@ -419,8 +419,9 @@ public final class ItemEffects {
     private static final class MenuClock implements ItemEffect {
         @Override public String itemId() { return ItemIds.MENU_CLOCK; }
 
+        /** 这块面板**左右键都要能开**（接口默认已改成只认右键，这里显式放开） */
         @Override public boolean accepts(boolean rightClick, boolean leftClick) {
-            return true;
+            return rightClick || leftClick;
         }
 
         @Override
